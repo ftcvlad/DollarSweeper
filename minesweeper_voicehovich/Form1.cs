@@ -19,6 +19,7 @@ namespace minesweeper_voicehovich {
         bool firstTouch;
         int demined;
         int bombsMarked;
+        bool killMyBrain = false;
 
         Bitmap one = Resources.one;
         Bitmap two = Resources.two;
@@ -34,8 +35,11 @@ namespace minesweeper_voicehovich {
         Bitmap bombBad = Resources.bombBad;
         Bitmap bombWrong = Resources.bombWrong;
 
-        TableLayoutPanel tableLayoutPanel1;
+        Bitmap whileHovered = Resources.whileHovered;
+        Bitmap whilePressed = Resources.whilePressed;
 
+        TableLayoutPanel tableLayoutPanel1;
+        PictureBox previousCursorOver = null;
         public Form1() {
 
             InitializeComponent();
@@ -43,6 +47,7 @@ namespace minesweeper_voicehovich {
             initializeTable(9,9, 10);
 
             button1.Click += new EventHandler(newGame);//test
+            this.MouseMove += new MouseEventHandler(mouseTableAndFramelMove);
         }
 
     
@@ -74,20 +79,27 @@ namespace minesweeper_voicehovich {
                 tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, cellSize));
             }
 
+            tableLayoutPanel1.MouseMove += new MouseEventHandler(mouseTableAndFramelMove);
+            
+
             for (int i = 0; i < r; i++) {
                 for (int j = 0; j < c; j++) {
 
-                    Button b = new Button();
+                    PictureBox pb = new PictureBox();
 
-                    b.FlatStyle = FlatStyle.Flat;
-                    b.FlatAppearance.BorderSize = 0;
 
-                   
-                    b.Margin = new Padding(0, 0, 0, 0);
-                    b.MouseUp += new MouseEventHandler(digitEventHandler);
-                  
-                    b.Tag = i * c + j;
-                    tableLayoutPanel1.Controls.Add(b, j, i);
+                    pb.Margin = new Padding(0);
+
+
+                    pb.MouseMove += new MouseEventHandler(mousePictureboxMove);
+
+                    pb.MouseUp += new MouseEventHandler(digitEventHandler);
+                    pb.MouseDown += new MouseEventHandler(mdHandler);
+
+
+                    
+                    pb.Tag = i * c + j;
+                    tableLayoutPanel1.Controls.Add(pb, j, i);
                    
                 }
             }
@@ -100,21 +112,97 @@ namespace minesweeper_voicehovich {
         }
 
 
+        
+
+        private void mdHandler(object sender, MouseEventArgs e) {//when mouseDown, do current cell animation
+
+
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+
+                if (((PictureBox)sender).Image == whileHovered) {//add flag
+                    ((PictureBox)sender).Image = flag;
+                    bombsMarked++;
+                }
+                else if (((PictureBox)sender).Image == flag) {
+                    ((PictureBox)sender).Image = null;
+                    bombsMarked--;
+
+                }
+                killMyBrain = true;
+
+            }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Left) {
+
+                if (((PictureBox)sender).Image != flag) {
+                    ((PictureBox)sender).Image = whilePressed;
+                }
+            }
 
 
 
+               
+        }
 
+        private void mouseTableAndFramelMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
+            if (previousCursorOver != null) {//when pictureBox is disabled, table starts capturing events
+                if (previousCursorOver.Image!= flag) {
+                    previousCursorOver.Image = null;
+                }
+                    
+                previousCursorOver = null;
+            }
+           
+        }
 
+        //3 CASES
+        //1) mouse unpressed, leave cells => table/form mouseMove event
+        //2) mouse pressed, leave cells => part A in pictureBox'es mouseMove event (as mousepressed, old pb continues to send events)
+        //3) move from 1 cell to another (can jump between unopened cells not hitting cell borders (table)) => part B in pictureBox'es mouseMove event
+        //also mark cell when first clicked; also use current cell (not sender) in mouseUp
 
-        //protected override void OnMouseDown(MouseEventArgs e) {
-        //    mouseDown = false;
+        private void mousePictureboxMove(object sender, MouseEventArgs e) {
+            //sender is always same => calculate source differently
 
-        //    SetSelectionRect();
-        //    Invalidate();
+            Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
+            PictureBox source = (PictureBox)tableLayoutPanel1.GetChildAtPoint(cursorTableRelative);
+            
+            //part A
+            if (source == null || source.Enabled == false) {
+                //Console.WriteLine("hehe");
+                if (previousCursorOver != null) {
+                    if (previousCursorOver.Image != flag) {
+                        previousCursorOver.Image = null;
+                    }
+                    previousCursorOver = null;
+                }
+                return;
+            }
+           
+            //part B
+            if (killMyBrain) {
+                return;
+            }
+            if (source!= previousCursorOver) {
+                if (previousCursorOver != null && previousCursorOver.Image!=flag) {
+                    previousCursorOver.Image = null;
+                }
+            
+                if (source.Image==flag ) {
+                    previousCursorOver = null;
+                    return;
+                }
+                previousCursorOver = source;
+               
+                if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
+                    source.Image = whilePressed;
+                }
+                else if (e.Button == MouseButtons.None) {
 
-        //    GetSelectedTextBoxes();
-        //}
+                    source.Image = whileHovered;
+                }
+            }
 
+        }
 
 
 
@@ -123,27 +211,26 @@ namespace minesweeper_voicehovich {
 
 
         private void digitEventHandler(object sender, MouseEventArgs e) {
-            Button source = (Button)sender;
+
+           
+
+            killMyBrain = false;
+
+            Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
+            PictureBox source = (PictureBox)tableLayoutPanel1.GetChildAtPoint(cursorTableRelative);
+            if (source == null) {//if press up outside cells
+                return;
+            }
+           
+          
             int loc = Int32.Parse(source.Tag.ToString());
             int r = loc / cols;
             int c = loc % cols;
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+            
+            if (e.Button == System.Windows.Forms.MouseButtons.Left) {
 
-
-                if (source.BackgroundImage ==null ) {//add flag
-                    source.BackgroundImage = flag;
-                    bombsMarked++;
-                }
-                else if (source.BackgroundImage == flag) {
-                    source.BackgroundImage = null;
-                    bombsMarked--;
-
-                }
-            }
-            else if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-
-                if (source.BackgroundImage == flag) {
+                if (source.Image == flag) {
                     return;
                 }
 
@@ -165,14 +252,16 @@ namespace minesweeper_voicehovich {
 
                     for (int i = 0; i < rows; i++) {
                         for (int j = 0; j < cols; j++) {
-                            Button nextCell = (Button)tableLayoutPanel1.GetControlFromPosition(j, i );
+                            PictureBox nextCell = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i );
                             nextCell.Enabled = false;
+                            Console.WriteLine("1");
                             if (grid[i][j]==-1 && nextCell.BackgroundImage == null) {
+                                Console.WriteLine("2");
                                 nextCell.BackgroundImage = bomb;
                                 continue;
                             }
 
-                            if ((grid[i][j] != -1 && nextCell.BackgroundImage == flag)) {
+                            if ((grid[i][j] != -1 && nextCell.Image == flag)) {
                                 nextCell.BackgroundImage = bombWrong;
                             }
                                 
@@ -198,9 +287,9 @@ namespace minesweeper_voicehovich {
                                 for (int dr = -1; dr <= 1; dr++) {
                                     for (int dc = -1; dc <= 1; dc++) {
 
-                                        if (i + dr >= 0 && j + dc >= 0 && i + dr < rows && j + dc < cols && grid[i + dr][j + dc] != -2 && grid[i + dr][j + dc] != -3 && grid[i + dr][j + dc] != 0 && ((Button)tableLayoutPanel1.GetControlFromPosition(j+dc, i+dr)).BackgroundImage != flag) {//!=0 is some bug case!
+                                        if (i + dr >= 0 && j + dc >= 0 && i + dr < rows && j + dc < cols && grid[i + dr][j + dc] != -2 && grid[i + dr][j + dc] != -3 && grid[i + dr][j + dc] != 0 && ((PictureBox)tableLayoutPanel1.GetControlFromPosition(j+dc, i+dr)).Image != flag) {//!=0 is some bug case!
 
-                                            Button borderDigit = (Button)tableLayoutPanel1.GetControlFromPosition(j + dc, i + dr);
+                                            PictureBox borderDigit = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j + dc, i + dr);
                                             openDigits(i + dr, j + dc, borderDigit);
 
 
@@ -212,10 +301,11 @@ namespace minesweeper_voicehovich {
 
                                     }
                                 }
-                              
 
 
-                                Button green = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
+
+                                PictureBox green = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
+                                green.Enabled = false;
                                 demined++;
                                 green.BackgroundImage = empty;
                                 //System.Threading.Thread.Sleep(100);
@@ -226,7 +316,7 @@ namespace minesweeper_voicehovich {
                     // DrawingControl.ResumeDrawing(this);
                 }
 
-                Console.WriteLine("+"+demined);
+               
                 if (demined == rows * cols - nOfBombs) {
                     Console.WriteLine("Wiiiiiin");
 
@@ -234,7 +324,7 @@ namespace minesweeper_voicehovich {
                         for (int j = 0; j < cols; j++) {
 
                             if (grid[i][j] == -1) {
-                                ((Button)tableLayoutPanel1.GetControlFromPosition(j, i)).BackgroundImage = flag;
+                                ((PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i)).Image = flag;
                             }
                         }
                     }
@@ -245,14 +335,10 @@ namespace minesweeper_voicehovich {
                
             }
 
-
-
-            
-
         }
 
 
-        private void openDigits(int r, int c, Button source) {
+        private void openDigits(int r, int c, PictureBox source) {
             demined++;
             if (grid[r][c] == 1) {
                 source.BackgroundImage = one;
@@ -285,28 +371,28 @@ namespace minesweeper_voicehovich {
         private void markEmptyRecursively(int row, int col) {
 
             if (row - 1 >= 0 && grid[row - 1][col] == 0 ) {
-                if (((Button)tableLayoutPanel1.GetControlFromPosition(col, row-1)).BackgroundImage != flag) {
+                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col, row-1)).Image != flag) {
                     grid[row - 1][col] = -2;
                     markEmptyRecursively(row - 1, col);
                 }
                 
             }
             if (row + 1 < rows && grid[row + 1][col] == 0) {
-                if (((Button)tableLayoutPanel1.GetControlFromPosition(col, row+1)).BackgroundImage != flag) {
+                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col, row+1)).Image != flag) {
                     grid[row + 1][col] = -2;
                     markEmptyRecursively(row + 1, col);
                 }
                
             }
             if (col - 1 >= 0 && grid[row][col-1] == 0) {
-                if (((Button)tableLayoutPanel1.GetControlFromPosition(col-1, row)).BackgroundImage != flag) {
+                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col-1, row)).Image != flag) {
                     grid[row][col - 1] = -2;
                     markEmptyRecursively(row, col - 1);
                 }
                 
             }
             if (col + 1 < cols && grid[row ][col+1] == 0) {
-                if (((Button)tableLayoutPanel1.GetControlFromPosition(col+1, row)).BackgroundImage != flag) {
+                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col+1, row)).Image != flag) {
                     grid[row][col + 1] = -2;
                     markEmptyRecursively(row, col + 1);
                 }
@@ -327,7 +413,7 @@ namespace minesweeper_voicehovich {
             for (int i = 0; i < rows; i++) {
                 List<int> nextRow = new List<int>();
                 for (int j = 0; j < cols; j++) {
-                    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
+                    PictureBox con = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
                     con.Enabled = true;
                     con.BackgroundImage = null;
 
@@ -371,7 +457,7 @@ namespace minesweeper_voicehovich {
 
                 //hide this
                 //Button con = (Button)tableLayoutPanel1.GetControlFromPosition(allCells[index] % cols, allCells[index] / cols);
-               // con.BackgroundImage = bomb;
+               // con.BackgroundBackgroundImage = bomb;
                 //--------
 
                 allCells.RemoveAt(index);
@@ -396,23 +482,23 @@ namespace minesweeper_voicehovich {
                         //hide this
                         //if (nOfBombsNextDoor == 1) {
                         //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundImage = one;
+                        //    con.BackgroundBackgroundImage = one;
                         //}
                         //else if (nOfBombsNextDoor == 2) {
                         //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundImage = two;
+                        //    con.BackgroundBackgroundImage = two;
                         //}
                         //else if (nOfBombsNextDoor == 3) {
                         //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundImage = three;
+                        //    con.BackgroundBackgroundImage = three;
                         //}
                         //else if (nOfBombsNextDoor == 4) {
                         //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundImage = four;
+                        //    con.BackgroundBackgroundImage = four;
                         //}
                         //else if (nOfBombsNextDoor == 5) {
                         //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundImage = five;
+                        //    con.BackgroundBackgroundImage = five;
                         //}
                     }
 
