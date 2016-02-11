@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace minesweeper_voicehovich {
-    public partial class CustomSize : Form {
+    public partial class CustomSizeForm : Form {
         MainForm mfRef;
         bool validInput = true;
         ToolTip hint = null;
-        public CustomSize(MainForm mfRef) {
+        public CustomSizeForm(MainForm mfRef) {
             this.mfRef = mfRef;
             InitializeComponent();
 
@@ -23,6 +23,8 @@ namespace minesweeper_voicehovich {
             tbMines.LostFocus += new EventHandler(TbWidth_LostFocus);
 
             this.LocationChanged += new EventHandler(formChangedLoc);
+            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
         }
 
         private void formChangedLoc(object sender, EventArgs e) {
@@ -127,7 +129,18 @@ namespace minesweeper_voicehovich {
                     return;
                 }
 
-
+                if (width==9 && height==9 && mines == 10) {
+                    mfRef.currentDifficulty = "beginner";
+                }
+                else if (width == 16 && height == 16 && mines == 40) {
+                    mfRef.currentDifficulty = "intermediate";
+                }
+                else if (width == 30 && height == 16 && mines == 99) {
+                    mfRef.currentDifficulty = "intermediate";
+                }
+                else {
+                    mfRef.currentDifficulty = "custom";//do nothing with best scores
+                }
 
                 mfRef.createNewSizeGrid(width, height, mines);
                 this.Dispose();

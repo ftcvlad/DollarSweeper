@@ -1,5 +1,5 @@
 ﻿namespace minesweeper_voicehovich {
-    partial class CustomSize {
+    partial class CustomSizeForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>

@@ -26,27 +26,37 @@ namespace minesweeper_voicehovich {
         Bitmap three = Resources.three;
         Bitmap four = Resources.four;
         Bitmap five = Resources.five;
-        Bitmap six = Resources.five;
-        Bitmap seven = Resources.five;
-        Bitmap eight = Resources.five;
+        Bitmap six = Resources.six;
+        Bitmap seven = Resources.seven;
+        Bitmap eight = Resources.eight;
         Bitmap empty = Resources.empty;
         Bitmap flag = Resources.flag;
-        Bitmap bomb = Resources.bomb;
-        Bitmap bombBad = Resources.bombBad;
-        Bitmap bombWrong = Resources.bombWrong;
+        Bitmap bomb = Resources.girl3;
+        Bitmap bombBad = Resources.happyGirl;
+        Bitmap bombWrong = Resources.girlWrong2;
+
+        Bitmap manOrd = Resources.man;
+        Bitmap manSad = Resources.sad;
+        Bitmap manHap = Resources.happy;
+        Bitmap manExcited = Resources.excited;
 
         Bitmap whileHovered = Resources.whileHovered;
         Bitmap whilePressed = Resources.whilePressed;
 
-       
+        Bitmap unopened = null;
+       // Bitmap unopened = Resources.unopened;//*** no borders in between, but slower. Use rectangle?
+
 
         TableLayoutPanel tableLayoutPanel1;
         PictureBox previousCursorOver = null;
         Timer MyTimer = new Timer();
         int timeElapsed = 0;
+        public String currentDifficulty = "beginner";
 
         counterPanel bombCounter = new counterPanel();
         counterPanel timeCounter = new counterPanel();
+        serializableArrays bestScores;
+
 
         public MainForm() {
 
@@ -54,33 +64,45 @@ namespace minesweeper_voicehovich {
 
             initializeTable(9,9, 10);
 
+            button1.Anchor = AnchorStyles.None;
+            button1.FlatAppearance.BorderSize = 0;
+            button1.Click += new EventHandler(newGame);
+        
+
+
+            button1.Size = new Size(60,60);
+
             tableLayoutPanel2.Location = new System.Drawing.Point(50, 50);
             tableLayoutPanel2.Controls.Add(bombCounter);
             tableLayoutPanel2.Controls.Add(button1);
             tableLayoutPanel2.Controls.Add(timeCounter);
 
             this.FormBorderStyle= FormBorderStyle.FixedSingle;
-            button1.Click += new EventHandler(newGame);//test
+            this.MaximizeBox = false;
+            
             this.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
 
           
             MyTimer.Interval = (1000);
             MyTimer.Tick += new EventHandler(timerTicked);
-          
 
 
+            bestScores = serializableArrays.Load();
 
         }
 
         private void timerTicked(object sender, EventArgs e) {
             timeElapsed++;
             timeCounter.setNumber(timeElapsed);
+            if (timeElapsed == 999) {
+                MyTimer.Stop();
+            }
         }
 
         private void initializeTable(int r, int c, int n) {
 
-           
 
+            button1.Image = manOrd;
 
             this.rows = r;
             this.cols = c;
@@ -99,7 +121,7 @@ namespace minesweeper_voicehovich {
 
             //------------tableLayoutPanel2 ------------
 
-            tableLayoutPanel2.Size = new Size(tableLayoutPanel2Width, tableLayoutPanel2Height);
+            tableLayoutPanel2.Size = new Size(tableLayoutPanel2Width, tableLayoutPanel2Height+2);//2 to make image fit...
             bombCounter.setNumber(nOfBombs);
 
             //------MainForm //
@@ -111,9 +133,9 @@ namespace minesweeper_voicehovich {
             tableLayoutPanel1.SuspendLayout();
 
 
-           
 
 
+           // tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.None;//***
             tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(sideOffset, 120);
             tableLayoutPanel1.Size = new Size(cols * (cellSize+1) + 1, rows * (cellSize + 1)+1);//take 1px border into account
@@ -147,6 +169,9 @@ namespace minesweeper_voicehovich {
                     pb.MouseDown += new MouseEventHandler(mdHandler);
 
 
+                    
+
+                    pb.Image = unopened;
                   
                     pb.Tag = i * c + j;
                     tableLayoutPanel1.Controls.Add(pb, j, i);
@@ -175,7 +200,7 @@ namespace minesweeper_voicehovich {
                     bombCounter.setNumber(nOfBombs - bombsMarked);
                 }
                 else if (((PictureBox)sender).Image == flag) {
-                    ((PictureBox)sender).Image = null;
+                    ((PictureBox)sender).Image = unopened;
                     bombsMarked--;
                     bombCounter.setNumber(nOfBombs - bombsMarked);
 
@@ -188,6 +213,7 @@ namespace minesweeper_voicehovich {
                 if (((PictureBox)sender).Image != flag) {
                     ((PictureBox)sender).Image = whilePressed;
                 }
+                button1.Image = manExcited;
             }
 
 
@@ -197,8 +223,8 @@ namespace minesweeper_voicehovich {
 
         private void mouseTableAndFrameMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
             if (previousCursorOver != null) {//when pictureBox is disabled, table starts capturing events
-                if (previousCursorOver.Image!= flag) {
-                    previousCursorOver.Image = null;
+                if (previousCursorOver.Image!= flag && previousCursorOver.Enabled==true) {
+                    previousCursorOver.Image = unopened;
                 }
                     
                 previousCursorOver = null;
@@ -221,10 +247,10 @@ namespace minesweeper_voicehovich {
             
             //part A
             if (source == null || source.Enabled == false) {
-                //Console.WriteLine("hehe");
+               
                 if (previousCursorOver != null) {
-                    if (previousCursorOver.Image != flag) {
-                        previousCursorOver.Image = null;
+                    if (previousCursorOver.Image != flag && previousCursorOver.Enabled == true) {
+                        previousCursorOver.Image = unopened;
                     }
                     previousCursorOver = null;
                 }
@@ -236,8 +262,8 @@ namespace minesweeper_voicehovich {
                 return;
             }
             if (source!= previousCursorOver) {
-                if (previousCursorOver != null && previousCursorOver.Image!=flag) {
-                    previousCursorOver.Image = null;
+                if (previousCursorOver != null && previousCursorOver.Image!=flag && previousCursorOver.Enabled == true) {
+                    previousCursorOver.Image = unopened;
                 }
             
                 if (source.Image==flag ) {
@@ -265,7 +291,7 @@ namespace minesweeper_voicehovich {
 
         private void digitEventHandler(object sender, MouseEventArgs e) {
 
-           
+            button1.Image = manOrd;
 
             killMyBrain = false;
 
@@ -303,7 +329,8 @@ namespace minesweeper_voicehovich {
                 }
                 else if (grid[r][c] == -1) {
                     MyTimer.Stop();
-                    source.BackgroundImage = bombBad;
+                    button1.Image = manSad;
+                    source.Image = bombBad;
 
 
                    
@@ -312,9 +339,9 @@ namespace minesweeper_voicehovich {
                             PictureBox nextCell = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i );
                             nextCell.Enabled = false;
                            
-                            if (grid[i][j]==-1 && nextCell.BackgroundImage == null) {
+                            if (grid[i][j]==-1 && nextCell.Image == unopened) {
                                
-                                nextCell.BackgroundImage = bomb;
+                                nextCell.Image = bomb;
                                 continue;
                             }
 
@@ -367,7 +394,7 @@ namespace minesweeper_voicehovich {
                                 PictureBox green = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
                                 green.Enabled = false;
                                 demined++;
-                                green.BackgroundImage = empty;
+                                green.Image = empty;
                                 //System.Threading.Thread.Sleep(100);
                             }//end of if ==-2
                         }
@@ -379,6 +406,8 @@ namespace minesweeper_voicehovich {
                
                 if (demined == rows * cols - nOfBombs) {
                     MyTimer.Stop();
+
+                    button1.Image = manHap;
                     Console.WriteLine("Wiiiiiin");
 
                     for (int i = 0; i < rows; i++) {//mark unmarked bombs
@@ -390,8 +419,10 @@ namespace minesweeper_voicehovich {
                         }
                     }
 
+                    bestScores.manageScores(currentDifficulty, timeElapsed);
                     //stop timer
                     //record results, top score
+                    bombCounter.setNumber(0);
                 }
                
             }
@@ -402,28 +433,28 @@ namespace minesweeper_voicehovich {
         private void openDigits(int r, int c, PictureBox source) {
             demined++;
             if (grid[r][c] == 1) {
-                source.BackgroundImage = one;
+                source.Image = one;
             }
             else if (grid[r][c] == 2) {
-                source.BackgroundImage = two;
+                source.Image = two;
             }
             else if (grid[r][c] == 3) {
-                source.BackgroundImage = three;
+                source.Image = three;
             }
             else if (grid[r][c] == 4) {
-                source.BackgroundImage = four;
+                source.Image = four;
             }
             else if (grid[r][c] == 5) {
-                source.BackgroundImage = five;
+                source.Image = five;
             }
             else if (grid[r][c] == 6) {
-                source.BackgroundImage = six;
+                source.Image = six;
             }
             else if (grid[r][c] == 7) {
-                source.BackgroundImage = seven;
+                source.Image = seven;
             }
             else if (grid[r][c] == 8) {
-                source.BackgroundImage = eight;
+                source.Image = eight;
             }
             grid[r][c] = -3;
         }
@@ -462,6 +493,7 @@ namespace minesweeper_voicehovich {
         }
 
         private void newGame(object sender, EventArgs e) {
+            button1.Image = manOrd;
             startGame();
         }
 
@@ -472,16 +504,17 @@ namespace minesweeper_voicehovich {
             bombsMarked = 0;
             timeElapsed = 0;
             timeCounter.setNumber(0);
+            bombCounter.setNumber(0);
             grid = new List<List<int>>();
             for (int i = 0; i < rows; i++) {
                 List<int> nextRow = new List<int>();
                 for (int j = 0; j < cols; j++) {
                     PictureBox con = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
                     con.Enabled = true;
-                    con.BackgroundImage = null;
-                    if (con.Image == flag) {
-                        con.Image = null;
-                    }
+                    con.Image = unopened;
+                    //if (con.Image == flag) {
+                    //    con.Image = null;
+                    //}
                     nextRow.Add(0);
 
                 }
@@ -495,8 +528,8 @@ namespace minesweeper_voicehovich {
         private void placeBombs(int r, int c) {
             int numOfCells = rows * cols;
 
-           // Random rnd = new Random((int)((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 1000));
-            Random rnd = new Random(1);
+            Random rnd = new Random((int)((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 1000));
+           // Random rnd = new Random(1);
 
             List<int> allCells = new List<int>();//to avoid repeated random numbers
             for (int i = 0; i < numOfCells; i++) {
@@ -596,113 +629,198 @@ namespace minesweeper_voicehovich {
         }
 
         private void beginner9x910MinesToolStripMenuItem_Click(object sender, EventArgs e) {
+            currentDifficulty = "beginner";
             createNewSizeGrid(9, 9, 10);
         }
 
         private void intermediate16x1640MinesToolStripMenuItem_Click(object sender, EventArgs e) {
+            currentDifficulty = "intermediate";
             createNewSizeGrid(16, 16, 40);
         }
 
         private void advanced30x2499MinesToolStripMenuItem_Click(object sender, EventArgs e) {
+            currentDifficulty = "advanced";
             createNewSizeGrid(30, 16, 99);
         }
 
         private void customSizeToolStripMenuItem_Click(object sender, EventArgs e) {
-            var form = new CustomSize(this);
+
+            CustomSizeForm form = new CustomSizeForm(this);
+            form.ShowDialog();
+        }
+
+        private void statisticsToolStripMenuItem_Click(object sender, EventArgs e) {
+            StatisticsForm form = new StatisticsForm(bestScores);
             form.ShowDialog();
         }
     }
 }
 
-
-public  class counterPanel : TableLayoutPanel {
-    //Bitmap _zero = Resources._zero;
-    //Bitmap _one = Resources._one;
-    //Bitmap _two = Resources._two;
-    //Bitmap _three = Resources._two;
-    //Bitmap _four = Resources._four;
-    //Bitmap _five = Resources._five;
-    //Bitmap _six = Resources._six;
-    //Bitmap _seven = Resources._seven;
-    //Bitmap _nine = Resources._nine;
+namespace minesweeper_voicehovich {
+    public class counterPanel : TableLayoutPanel {
 
 
-    Bitmap[] pics = { Resources._zero, Resources._one,Resources._two, Resources._three, Resources._four, Resources._five,
+        Bitmap[] pics = { Resources._zero, Resources._one,Resources._two, Resources._three, Resources._four, Resources._five,
                     Resources._six,Resources._seven, Resources._eight, Resources._nine};
-    Bitmap _minus = Resources._minus;
+        Bitmap _minus = Resources._minus;
 
-    public counterPanel() {
+        public counterPanel() {
 
-        ColumnCount = 3;
-        RowCount = 1;
+            ColumnCount = 3;
+            RowCount = 1;
 
-        RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        
+            RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
-        for (int j = 0; j < 3; j++) {
-            ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
 
-            PictureBox p = new PictureBox();
-            p.Image = pics[0];
-            p.Margin = new Padding(0);
-            p.Anchor = AnchorStyles.None;
-            p.Size = p.Image.Size;
-            Controls.Add(p);
+            for (int j = 0; j < 3; j++) {
+                ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+
+                PictureBox p = new PictureBox();
+                p.Image = pics[0];
+                p.Margin = new Padding(0);
+                p.Anchor = AnchorStyles.None;
+                p.Size = p.Image.Size;
+                Controls.Add(p);
+            }
+
+            CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+
+            this.Margin = new Padding(0);
         }
 
-        CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        public void setNumber(int num) {
 
-        this.Margin = new Padding(0);
+            String str = num + "";
+            if (num >= 0) {
+
+                if (str.Length == 1) {
+                    str = "00" + str;
+                }
+                else if (str.Length == 2) {
+                    str = "0" + str;
+                }
+
+                for (int i = 0; i < 3; i++) {
+                    int index = (int)Char.GetNumericValue(str[i]);
+                    PictureBox nextPic = (PictureBox)this.GetControlFromPosition(i, 0);
+
+                    nextPic.Image = pics[index];
+                }
+            }
+            else {
+                if (str.Length == 2) {
+                    ((PictureBox)this.GetControlFromPosition(0, 0)).Image = pics[0];
+                    ((PictureBox)this.GetControlFromPosition(1, 0)).Image = _minus;
+                    ((PictureBox)this.GetControlFromPosition(2, 0)).Image = pics[(int)Char.GetNumericValue(str[1])];
+                }
+                else if (str.Length == 3) {
+                    ((PictureBox)this.GetControlFromPosition(0, 0)).Image = _minus;
+                    ((PictureBox)this.GetControlFromPosition(1, 0)).Image = pics[(int)Char.GetNumericValue(str[1])];
+                    ((PictureBox)this.GetControlFromPosition(2, 0)).Image = pics[(int)Char.GetNumericValue(str[2])];
+                }
+            }
+
+        }
+
+
+
+
+
     }
-
-    public void setNumber(int num) {
-
-        String str = num + "";
-        if (num >= 0) {
-
-            if (str.Length == 1) {
-                str = "00" + str;
-            }
-            else if (str.Length == 2) {
-                str = "0" + str;
-            }
-
-            for (int i = 0; i < 3; i++) {
-                int index = (int)Char.GetNumericValue(str[i]);
-                PictureBox nextPic = (PictureBox)this.GetControlFromPosition(i, 0);
-
-                nextPic.Image = pics[index];
-            }
-        }
-        else {
-            if (str.Length == 2) {
-                ((PictureBox)this.GetControlFromPosition(0, 0)).Image = pics[0];
-                ((PictureBox)this.GetControlFromPosition(1, 0)).Image = _minus;
-                ((PictureBox)this.GetControlFromPosition(2, 0)).Image = pics[(int)Char.GetNumericValue(str[1])];
-            }
-            else if (str.Length == 3) {
-                ((PictureBox)this.GetControlFromPosition(0, 0)).Image = _minus;
-                ((PictureBox)this.GetControlFromPosition(1, 0)).Image = pics[(int)Char.GetNumericValue(str[1])];
-                ((PictureBox)this.GetControlFromPosition(2, 0)).Image = pics[(int)Char.GetNumericValue(str[2])];
-            }
-        }
-
-    }
-
-
-
-
-
 }
 
 
 
 
+namespace minesweeper_voicehovich {
+    [Serializable()]
+    public class serializableArrays {
+
+        public Tuple<int, string>[] begBestScores = new Tuple<int, string>[10];
+        public Tuple<int, string>[] interBestScores = new Tuple<int, string>[10];
+        public Tuple<int, string>[] advBestScores = new Tuple<int, string>[10];
 
 
 
 
+        Tuple<string, int> t = new Tuple<string, int>("Hello", 4);
 
+        private static String filePath = "bestScores.txt";
+
+        public serializableArrays() {
+
+            for (int i = 0; i < 10; i++) {
+                begBestScores[i] = new Tuple<int, string>(999, "unknown");
+                interBestScores[i] = new Tuple<int, string>(999, "unknown");
+                advBestScores[i] = new Tuple<int, string>(999, "unknown");
+            }
+
+        }
+
+
+        public static void Save(serializableArrays obj) {
+
+            System.IO.Stream stream = System.IO.File.Open(filePath, System.IO.FileMode.Create);
+            var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            binaryFormatter.Serialize(stream, obj);
+
+
+
+        }
+
+        public static serializableArrays Load() {
+            try {
+                System.IO.Stream stream = System.IO.File.Open(filePath, System.IO.FileMode.Open);
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return (serializableArrays)binaryFormatter.Deserialize(stream);
+            }
+            catch(System.Runtime.Serialization.SerializationException se) {
+                serializableArrays sa = new serializableArrays();
+                return sa;
+            }
+            catch (System.IO.FileNotFoundException e) {
+                serializableArrays sa = new serializableArrays();
+                return sa;
+            }
+        }
+
+
+
+        public void manageScores(String difficulty, int score) {
+            if (difficulty.Equals("beginner")) {
+                updateScores(begBestScores, score);
+            }
+            else if (difficulty.Equals("intermediate")) {
+                updateScores(interBestScores, score);
+            }
+            else if (difficulty.Equals("advanced")) {
+                updateScores(advBestScores, score);
+            }
+        }
+
+        public void updateScores(Tuple<int, string>[] arrToUpdate, int score) {
+
+            for (int i = 0; i < 10; i++) {
+                if (arrToUpdate[i].Item1 > score) {
+
+                    for (int j = 9; j > i; j--) {
+                        arrToUpdate[j] = arrToUpdate[j - 1];
+                    }
+                    //make enter name frame
+
+                    Label aCaseForName=new Label();
+                    WinnerNameForm form = new WinnerNameForm(aCaseForName);
+                    form.ShowDialog();
+
+                    arrToUpdate[i] = new Tuple<int, string>(score, aCaseForName.Text);
+                    serializableArrays.Save(this);
+                    return;
+                }
+            }
+        }
+
+    }
+}
 
 
 
