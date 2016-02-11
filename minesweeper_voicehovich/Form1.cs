@@ -11,7 +11,7 @@ using minesweeper_voicehovich.Properties;//for resources
 using System.Runtime.InteropServices;//for dllimport
 
 namespace minesweeper_voicehovich {
-    public partial class Form1 : Form {
+    public partial class MainForm : Form {
         int rows;
         int cols;
         int nOfBombs;
@@ -38,34 +38,84 @@ namespace minesweeper_voicehovich {
         Bitmap whileHovered = Resources.whileHovered;
         Bitmap whilePressed = Resources.whilePressed;
 
+       
+
         TableLayoutPanel tableLayoutPanel1;
         PictureBox previousCursorOver = null;
-        public Form1() {
+        Timer MyTimer = new Timer();
+        int timeElapsed = 0;
+
+        counterPanel bombCounter = new counterPanel();
+        counterPanel timeCounter = new counterPanel();
+
+        public MainForm() {
 
             InitializeComponent();
 
             initializeTable(9,9, 10);
 
+            tableLayoutPanel2.Location = new System.Drawing.Point(50, 50);
+            tableLayoutPanel2.Controls.Add(bombCounter);
+            tableLayoutPanel2.Controls.Add(button1);
+            tableLayoutPanel2.Controls.Add(timeCounter);
+
+            this.FormBorderStyle= FormBorderStyle.FixedSingle;
             button1.Click += new EventHandler(newGame);//test
-            this.MouseMove += new MouseEventHandler(mouseTableAndFramelMove);
+            this.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
+
+          
+            MyTimer.Interval = (1000);
+            MyTimer.Tick += new EventHandler(timerTicked);
+          
+
+
+
         }
 
-    
+        private void timerTicked(object sender, EventArgs e) {
+            timeElapsed++;
+            timeCounter.setNumber(timeElapsed);
+        }
 
         private void initializeTable(int r, int c, int n) {
+
+           
+
+
             this.rows = r;
             this.cols = c;
             this.nOfBombs = n;
             int cellSize = 17;
 
+            int sideOffset = 50;
+            int tableLayoutPanel2Width = Math.Max(270, cols * (cellSize + 1) + 1);
+            int tableLayoutPanel2Height = 50;
+            int tableLayoutPanel1Height = rows * (cellSize + 1) + 1;
+
+            //http://stackoverflow.com/questions/2022660/how-to-get-the-size-of-a-winforms-form-titlebar-height
+            Rectangle screenRectangle = RectangleToScreen(this.ClientRectangle);
+            int titleHeight = screenRectangle.Top - this.Top;
+
+
+            //------------tableLayoutPanel2 ------------
+
+            tableLayoutPanel2.Size = new Size(tableLayoutPanel2Width, tableLayoutPanel2Height);
+            bombCounter.setNumber(nOfBombs);
+
+            //------MainForm //
+
+            this.Size = new Size(tableLayoutPanel2Width + sideOffset * 2+7*2, sideOffset*2 + Math.Max(tableLayoutPanel1Height, 160) + 20 + tableLayoutPanel2Height+ titleHeight);
+
+            //------------tableLayoutPanel1 ------------
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel1.SuspendLayout();
-            
-            
+
+
            
 
+
             tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(43, 74);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(sideOffset, 120);
             tableLayoutPanel1.Size = new Size(cols * (cellSize+1) + 1, rows * (cellSize + 1)+1);//take 1px border into account
             tableLayoutPanel1.ColumnCount = cols;
             tableLayoutPanel1.RowCount = rows;
@@ -79,7 +129,7 @@ namespace minesweeper_voicehovich {
                 tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, cellSize));
             }
 
-            tableLayoutPanel1.MouseMove += new MouseEventHandler(mouseTableAndFramelMove);
+            tableLayoutPanel1.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
             
 
             for (int i = 0; i < r; i++) {
@@ -97,7 +147,7 @@ namespace minesweeper_voicehovich {
                     pb.MouseDown += new MouseEventHandler(mdHandler);
 
 
-                    
+                  
                     pb.Tag = i * c + j;
                     tableLayoutPanel1.Controls.Add(pb, j, i);
                    
@@ -116,16 +166,18 @@ namespace minesweeper_voicehovich {
 
         private void mdHandler(object sender, MouseEventArgs e) {//when mouseDown, do current cell animation
 
-
+           
             if (e.Button == System.Windows.Forms.MouseButtons.Right) {
 
                 if (((PictureBox)sender).Image == whileHovered) {//add flag
                     ((PictureBox)sender).Image = flag;
                     bombsMarked++;
+                    bombCounter.setNumber(nOfBombs - bombsMarked);
                 }
                 else if (((PictureBox)sender).Image == flag) {
                     ((PictureBox)sender).Image = null;
                     bombsMarked--;
+                    bombCounter.setNumber(nOfBombs - bombsMarked);
 
                 }
                 killMyBrain = true;
@@ -143,7 +195,7 @@ namespace minesweeper_voicehovich {
                
         }
 
-        private void mouseTableAndFramelMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
+        private void mouseTableAndFrameMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
             if (previousCursorOver != null) {//when pictureBox is disabled, table starts capturing events
                 if (previousCursorOver.Image!= flag) {
                     previousCursorOver.Image = null;
@@ -151,7 +203,8 @@ namespace minesweeper_voicehovich {
                     
                 previousCursorOver = null;
             }
-           
+
+            
         }
 
         //3 CASES
@@ -241,6 +294,7 @@ namespace minesweeper_voicehovich {
                     firstTouch = false;
                     placeBombs(r, c);
 
+                    MyTimer.Start();
                 }
 
                 if (grid[r][c] > 0) {
@@ -248,29 +302,35 @@ namespace minesweeper_voicehovich {
                     
                 }
                 else if (grid[r][c] == -1) {
+                    MyTimer.Stop();
                     source.BackgroundImage = bombBad;
 
+
+                   
                     for (int i = 0; i < rows; i++) {
                         for (int j = 0; j < cols; j++) {
                             PictureBox nextCell = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i );
                             nextCell.Enabled = false;
-                            Console.WriteLine("1");
+                           
                             if (grid[i][j]==-1 && nextCell.BackgroundImage == null) {
-                                Console.WriteLine("2");
+                               
                                 nextCell.BackgroundImage = bomb;
                                 continue;
                             }
 
                             if ((grid[i][j] != -1 && nextCell.Image == flag)) {
-                                nextCell.BackgroundImage = bombWrong;
+                                nextCell.Image = bombWrong;
                             }
                                 
 
                         }
                     }
 
+
+
                     //stop timer
-                           
+                    return;
+
                 }
                 else if (grid[r][c] == 0) {
 
@@ -318,6 +378,7 @@ namespace minesweeper_voicehovich {
 
                
                 if (demined == rows * cols - nOfBombs) {
+                    MyTimer.Stop();
                     Console.WriteLine("Wiiiiiin");
 
                     for (int i = 0; i < rows; i++) {//mark unmarked bombs
@@ -409,6 +470,8 @@ namespace minesweeper_voicehovich {
             firstTouch = true;
             demined = 0;
             bombsMarked = 0;
+            timeElapsed = 0;
+            timeCounter.setNumber(0);
             grid = new List<List<int>>();
             for (int i = 0; i < rows; i++) {
                 List<int> nextRow = new List<int>();
@@ -416,7 +479,9 @@ namespace minesweeper_voicehovich {
                     PictureBox con = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
                     con.Enabled = true;
                     con.BackgroundImage = null;
-
+                    if (con.Image == flag) {
+                        con.Image = null;
+                    }
                     nextRow.Add(0);
 
                 }
@@ -439,15 +504,17 @@ namespace minesweeper_voicehovich {
             }
 
             //cells around 1st touch cannot contain bombs!
-            for (int dr = -1; dr <= 1; dr++) {
-                for (int dc = -1; dc <= 1; dc++) {
+            if (numOfCells - 9 >= nOfBombs) {//make sure enough space to put 
 
-                    if (r + dr >= 0 && c + dc >= 0 && r + dr < rows && c + dc < cols ) {
-                        allCells.RemoveAt(allCells.IndexOf((r + dr) * cols + c + dc)); 
+                for (int dr = -1; dr <= 1; dr++) {
+                    for (int dc = -1; dc <= 1; dc++) {
+
+                        if (r + dr >= 0 && c + dc >= 0 && r + dr < rows && c + dc < cols) {
+                            allCells.RemoveAt(allCells.IndexOf((r + dr) * cols + c + dc));
+                        }
                     }
                 }
             }
-
             //bombs
             int index;
             for (int i=0;i< nOfBombs; i++) { 
@@ -456,8 +523,8 @@ namespace minesweeper_voicehovich {
                 grid[allCells[index] / cols][allCells[index] % cols] = -1;
 
                 //hide this
-                //Button con = (Button)tableLayoutPanel1.GetControlFromPosition(allCells[index] % cols, allCells[index] / cols);
-               // con.BackgroundBackgroundImage = bomb;
+                //PictureBox  con = (PictureBox)tableLayoutPanel1.GetControlFromPosition(allCells[index] % cols, allCells[index] / cols);
+                //con.BackgroundImage = bomb;
                 //--------
 
                 allCells.RemoveAt(index);
@@ -514,21 +581,139 @@ namespace minesweeper_voicehovich {
 
         
 
-        private void intermediate16x1640MinesToolStripMenuItem_Click(object sender, EventArgs e) {
        
+
+        public  void createNewSizeGrid(int width, int height, int mines) {
             tableLayoutPanel1.Dispose();
-            initializeTable(16,16,40);
+            initializeTable(height, width, mines);//change width and height order, as I screwed i,j order
             startGame();
         }
 
-        private void beginner9x916MinesToolStripMenuItem_Click(object sender, EventArgs e) {
-            tableLayoutPanel1.Dispose();
-            initializeTable(9, 9, 10);
-            startGame();
+    
+
+        private void button1_Click(object sender, EventArgs e) {
+
+        }
+
+        private void beginner9x910MinesToolStripMenuItem_Click(object sender, EventArgs e) {
+            createNewSizeGrid(9, 9, 10);
+        }
+
+        private void intermediate16x1640MinesToolStripMenuItem_Click(object sender, EventArgs e) {
+            createNewSizeGrid(16, 16, 40);
+        }
+
+        private void advanced30x2499MinesToolStripMenuItem_Click(object sender, EventArgs e) {
+            createNewSizeGrid(30, 16, 99);
+        }
+
+        private void customSizeToolStripMenuItem_Click(object sender, EventArgs e) {
+            var form = new CustomSize(this);
+            form.ShowDialog();
         }
     }
 }
 
+
+public  class counterPanel : TableLayoutPanel {
+    //Bitmap _zero = Resources._zero;
+    //Bitmap _one = Resources._one;
+    //Bitmap _two = Resources._two;
+    //Bitmap _three = Resources._two;
+    //Bitmap _four = Resources._four;
+    //Bitmap _five = Resources._five;
+    //Bitmap _six = Resources._six;
+    //Bitmap _seven = Resources._seven;
+    //Bitmap _nine = Resources._nine;
+
+
+    Bitmap[] pics = { Resources._zero, Resources._one,Resources._two, Resources._three, Resources._four, Resources._five,
+                    Resources._six,Resources._seven, Resources._eight, Resources._nine};
+    Bitmap _minus = Resources._minus;
+
+    public counterPanel() {
+
+        ColumnCount = 3;
+        RowCount = 1;
+
+        RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        
+
+        for (int j = 0; j < 3; j++) {
+            ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+
+            PictureBox p = new PictureBox();
+            p.Image = pics[0];
+            p.Margin = new Padding(0);
+            p.Anchor = AnchorStyles.None;
+            p.Size = p.Image.Size;
+            Controls.Add(p);
+        }
+
+        CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+
+        this.Margin = new Padding(0);
+    }
+
+    public void setNumber(int num) {
+
+        String str = num + "";
+        if (num >= 0) {
+
+            if (str.Length == 1) {
+                str = "00" + str;
+            }
+            else if (str.Length == 2) {
+                str = "0" + str;
+            }
+
+            for (int i = 0; i < 3; i++) {
+                int index = (int)Char.GetNumericValue(str[i]);
+                PictureBox nextPic = (PictureBox)this.GetControlFromPosition(i, 0);
+
+                nextPic.Image = pics[index];
+            }
+        }
+        else {
+            if (str.Length == 2) {
+                ((PictureBox)this.GetControlFromPosition(0, 0)).Image = pics[0];
+                ((PictureBox)this.GetControlFromPosition(1, 0)).Image = _minus;
+                ((PictureBox)this.GetControlFromPosition(2, 0)).Image = pics[(int)Char.GetNumericValue(str[1])];
+            }
+            else if (str.Length == 3) {
+                ((PictureBox)this.GetControlFromPosition(0, 0)).Image = _minus;
+                ((PictureBox)this.GetControlFromPosition(1, 0)).Image = pics[(int)Char.GetNumericValue(str[1])];
+                ((PictureBox)this.GetControlFromPosition(2, 0)).Image = pics[(int)Char.GetNumericValue(str[2])];
+            }
+        }
+
+    }
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// http://stackoverflow.com/questions/13194674/foreach-loop-to-create-100-buttons-painting-all-buttons-at-same-time-as-to-prev
 //class DrawingControl {
 //    [DllImport("user32.dll")]
 //    public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
