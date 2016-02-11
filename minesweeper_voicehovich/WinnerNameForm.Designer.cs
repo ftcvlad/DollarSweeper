@@ -65,6 +65,7 @@
             this.Controls.Add(this.label1);
             this.Name = "WinnerNameForm";
             this.Text = "Hoooray!";
+            this.Load += new System.EventHandler(this.WinnerNameForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

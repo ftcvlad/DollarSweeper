@@ -24,5 +24,9 @@ namespace minesweeper_voicehovich {
                 this.Dispose();
             }
         }
+
+        private void WinnerNameForm_Load(object sender, EventArgs e) {
+
+        }
     }
 }
