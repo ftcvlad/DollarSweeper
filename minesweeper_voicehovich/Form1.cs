@@ -51,6 +51,12 @@ namespace minesweeper_voicehovich {
         PictureBox previousCursorOver = null;
         Timer MyTimer = new Timer();
         int timeElapsed = 0;
+        int dollarsCollected = 0;
+        public int moneyLostPerGirl = 10000;
+
+        
+      
+
         public String currentDifficulty = "beginner";
 
         counterPanel bombCounter = new counterPanel();
@@ -58,7 +64,8 @@ namespace minesweeper_voicehovich {
         serializableArrays bestScores;
 
 
-        public MainForm() {
+
+        public MainForm() {//contains initializations happening once
 
             InitializeComponent();
 
@@ -76,6 +83,9 @@ namespace minesweeper_voicehovich {
             tableLayoutPanel2.Controls.Add(bombCounter);
             tableLayoutPanel2.Controls.Add(button1);
             tableLayoutPanel2.Controls.Add(timeCounter);
+
+            dollarsCollectedLabel.Text = "$ 0";
+            Controls.Add(dollarsCollectedLabel);
 
             this.FormBorderStyle= FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -127,6 +137,19 @@ namespace minesweeper_voicehovich {
             //------MainForm //
 
             this.Size = new Size(tableLayoutPanel2Width + sideOffset * 2+7*2, sideOffset*2 + Math.Max(tableLayoutPanel1Height, 160) + 20 + tableLayoutPanel2Height+ titleHeight);
+
+
+            //--dollarLabel
+
+
+
+
+
+
+            dollarsCollectedLabel.Location = new System.Drawing.Point(sideOffset, sideOffset  + Math.Max(tableLayoutPanel1Height, 160) + 20 + tableLayoutPanel2Height + titleHeight-20);
+           
+           
+          
 
             //------------tableLayoutPanel1 ------------
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -328,36 +351,44 @@ namespace minesweeper_voicehovich {
                     
                 }
                 else if (grid[r][c] == -1) {
-                    MyTimer.Stop();
-                    button1.Image = manSad;
+
+                    dollarsCollected = dollarsCollected - moneyLostPerGirl;
+                    dollarsCollectedLabel.Text = "$ " + dollarsCollected;
                     source.Image = bombBad;
+                    
+                    if (dollarsCollected<0) {
+
+                        MyTimer.Stop();
+                        button1.Image = manSad;
+                        
+
+                        for (int i = 0; i < rows; i++) {
+                            for (int j = 0; j < cols; j++) {
+                                PictureBox nextCell = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
+                                nextCell.Enabled = false;
+
+                                if (grid[i][j] == -1 && nextCell.Image == unopened) {
+
+                                    nextCell.Image = bomb;
+                                    continue;
+                                }
+
+                                if ((grid[i][j] != -1 && nextCell.Image == flag)) {
+                                    nextCell.Image = bombWrong;
+                                }
 
 
-                   
-                    for (int i = 0; i < rows; i++) {
-                        for (int j = 0; j < cols; j++) {
-                            PictureBox nextCell = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i );
-                            nextCell.Enabled = false;
-                           
-                            if (grid[i][j]==-1 && nextCell.Image == unopened) {
-                               
-                                nextCell.Image = bomb;
-                                continue;
                             }
-
-                            if ((grid[i][j] != -1 && nextCell.Image == flag)) {
-                                nextCell.Image = bombWrong;
-                            }
-                                
-
                         }
+
+
+
+                        //stop timer
+                        return;
                     }
-
-
-
-                    //stop timer
-                    return;
-
+                    else {
+                        source.Enabled = false;
+                    }
                 }
                 else if (grid[r][c] == 0) {
 
@@ -419,7 +450,9 @@ namespace minesweeper_voicehovich {
                         }
                     }
 
-                    bestScores.manageScores(currentDifficulty, timeElapsed);
+                    if (moneyLostPerGirl == 10000) {//record only 1 life games
+                        bestScores.manageScores(currentDifficulty, timeElapsed);
+                    }
                     //stop timer
                     //record results, top score
                     bombCounter.setNumber(0);
@@ -434,29 +467,40 @@ namespace minesweeper_voicehovich {
             demined++;
             if (grid[r][c] == 1) {
                 source.Image = one;
+                dollarsCollected++;
             }
             else if (grid[r][c] == 2) {
                 source.Image = two;
+                dollarsCollected += 2;
             }
             else if (grid[r][c] == 3) {
                 source.Image = three;
+                dollarsCollected += 3;
             }
             else if (grid[r][c] == 4) {
                 source.Image = four;
+                dollarsCollected += 4;
             }
             else if (grid[r][c] == 5) {
                 source.Image = five;
+                dollarsCollected += 5;
             }
             else if (grid[r][c] == 6) {
                 source.Image = six;
+                dollarsCollected += 6;
             }
             else if (grid[r][c] == 7) {
                 source.Image = seven;
+                dollarsCollected += 7;
             }
             else if (grid[r][c] == 8) {
                 source.Image = eight;
+                dollarsCollected += 8;
             }
+            dollarsCollectedLabel.Text = "$ " + dollarsCollected;
             grid[r][c] = -3;
+
+
         }
 
     
@@ -501,10 +545,13 @@ namespace minesweeper_voicehovich {
 
             firstTouch = true;
             demined = 0;
+            dollarsCollected = 0;
+            dollarsCollectedLabel.Text = "$ 0";
             bombsMarked = 0;
             timeElapsed = 0;
             timeCounter.setNumber(0);
-            bombCounter.setNumber(0);
+            MyTimer.Stop();
+            bombCounter.setNumber(nOfBombs);
             grid = new List<List<int>>();
             for (int i = 0; i < rows; i++) {
                 List<int> nextRow = new List<int>();
@@ -651,6 +698,18 @@ namespace minesweeper_voicehovich {
 
         private void statisticsToolStripMenuItem_Click(object sender, EventArgs e) {
             StatisticsForm form = new StatisticsForm(bestScores);
+            form.ShowDialog();
+        }
+
+        private void setMoneyLostlivesToolStripMenuItem_Click(object sender, EventArgs e) {
+            LossSelectorForm form = new LossSelectorForm(this);
+            form.ShowDialog();
+        }
+
+        private void aboutDollarSweeperToolStripMenuItem_Click(object sender, EventArgs e) {
+
+
+            AboutForm form = new AboutForm();
             form.ShowDialog();
         }
     }

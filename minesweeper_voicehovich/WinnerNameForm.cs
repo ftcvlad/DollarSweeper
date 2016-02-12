@@ -15,7 +15,8 @@ namespace minesweeper_voicehovich {
             aLittleCase = name;
             InitializeComponent();
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
+         
+            this.ControlBox = false;
         }
 
         private void button1_Click(object sender, EventArgs e) {

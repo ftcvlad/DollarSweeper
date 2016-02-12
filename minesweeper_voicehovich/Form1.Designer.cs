@@ -31,8 +31,13 @@
             this.intermediate16x1640MinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.advanced30x2499MinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.customSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.statisticsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.setMoneyLostlivesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutDollarSweeperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dollarsCollectedLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,7 +57,7 @@
             this.tableLayoutPanel2.ColumnCount = 3;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 90F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 102F));
             this.tableLayoutPanel2.Location = new System.Drawing.Point(50, 107);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
@@ -78,7 +83,10 @@
             this.intermediate16x1640MinesToolStripMenuItem,
             this.advanced30x2499MinesToolStripMenuItem,
             this.customSizeToolStripMenuItem,
-            this.statisticsToolStripMenuItem});
+            this.toolStripSeparator1,
+            this.statisticsToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.setMoneyLostlivesToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -111,6 +119,11 @@
             this.customSizeToolStripMenuItem.Text = "CustomSize";
             this.customSizeToolStripMenuItem.Click += new System.EventHandler(this.customSizeToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(228, 6);
+            // 
             // statisticsToolStripMenuItem
             // 
             this.statisticsToolStripMenuItem.Name = "statisticsToolStripMenuItem";
@@ -118,23 +131,56 @@
             this.statisticsToolStripMenuItem.Text = "Statistics";
             this.statisticsToolStripMenuItem.Click += new System.EventHandler(this.statisticsToolStripMenuItem_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(228, 6);
+            // 
+            // setMoneyLostlivesToolStripMenuItem
+            // 
+            this.setMoneyLostlivesToolStripMenuItem.Name = "setMoneyLostlivesToolStripMenuItem";
+            this.setMoneyLostlivesToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.setMoneyLostlivesToolStripMenuItem.Text = "Set money lost per girl";
+            this.setMoneyLostlivesToolStripMenuItem.Click += new System.EventHandler(this.setMoneyLostlivesToolStripMenuItem_Click);
+            // 
             // aboutToolStripMenuItem
             // 
+            this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutDollarSweeperToolStripMenuItem});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
             this.aboutToolStripMenuItem.Text = "About";
+            // 
+            // aboutDollarSweeperToolStripMenuItem
+            // 
+            this.aboutDollarSweeperToolStripMenuItem.Name = "aboutDollarSweeperToolStripMenuItem";
+            this.aboutDollarSweeperToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.aboutDollarSweeperToolStripMenuItem.Text = "About DollarSweeper";
+            this.aboutDollarSweeperToolStripMenuItem.Click += new System.EventHandler(this.aboutDollarSweeperToolStripMenuItem_Click);
+            // 
+            // dollarsCollectedLabel
+            // 
+            this.dollarsCollectedLabel.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.dollarsCollectedLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.dollarsCollectedLabel.Font = new System.Drawing.Font("MS Reference Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dollarsCollectedLabel.Location = new System.Drawing.Point(307, 247);
+            this.dollarsCollectedLabel.Name = "dollarsCollectedLabel";
+            this.dollarsCollectedLabel.Size = new System.Drawing.Size(99, 24);
+            this.dollarsCollectedLabel.TabIndex = 7;
+            this.dollarsCollectedLabel.Text = "$ 123";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 382);
+            this.Controls.Add(this.dollarsCollectedLabel);
             this.Controls.Add(this.tableLayoutPanel2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "DollarSweeper";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -149,12 +195,17 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem beginner9x910MinesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem customSizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem advanced30x2499MinesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem intermediate16x1640MinesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem statisticsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setMoneyLostlivesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutDollarSweeperToolStripMenuItem;
+        private System.Windows.Forms.Label dollarsCollectedLabel;
     }
 }
 
