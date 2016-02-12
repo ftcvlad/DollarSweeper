@@ -540,7 +540,7 @@ namespace minesweeper_voicehovich {
             button1.Image = manOrd;
             startGame();
         }
-
+        //zzz
         private void startGame() {
 
             firstTouch = true;
