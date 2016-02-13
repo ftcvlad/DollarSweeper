@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace minesweeper_voicehovich {
     public partial class LossSelectorForm : Form {
-        MainForm mfr;
-        public LossSelectorForm(MainForm mfr) {
-            this.mfr = mfr;
+        SweeperPanel spr;
+        public LossSelectorForm(SweeperPanel spr) {
+            this.spr = spr;
             InitializeComponent();
             MessageLabel.MaximumSize = new Size(211, 0);
             this.ControlBox = false;
@@ -27,10 +27,14 @@ namespace minesweeper_voicehovich {
 
             var checkedButton = groupBox1.Controls.OfType<RadioButton>()
                                       .FirstOrDefault(r => r.Checked);
-            
-            mfr.moneyLostPerGirl = Int32.Parse(checkedButton.Tag.ToString());
+
+            spr.moneyLostPerGirl = Int32.Parse(checkedButton.Tag.ToString());
 
             this.Dispose();
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e) {
+
         }
     }
 }

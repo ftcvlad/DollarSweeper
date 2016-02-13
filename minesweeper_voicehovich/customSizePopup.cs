@@ -10,11 +10,17 @@ using System.Windows.Forms;
 
 namespace minesweeper_voicehovich {
     public partial class CustomSizeForm : Form {
+        
         MainForm mfRef;
         bool validInput = true;
         ToolTip hint = null;
-        public CustomSizeForm(MainForm mfRef) {
+
+
+
+        public CustomSizeForm( MainForm mfRef) {
+           
             this.mfRef = mfRef;
+           
             InitializeComponent();
 
 
@@ -129,20 +135,21 @@ namespace minesweeper_voicehovich {
                     return;
                 }
 
+                string diffic;
                 if (width==9 && height==9 && mines == 10) {
-                    mfRef.currentDifficulty = "beginner";
+                    diffic = "beginner";
                 }
                 else if (width == 16 && height == 16 && mines == 40) {
-                    mfRef.currentDifficulty = "intermediate";
+                    diffic = "intermediate";
                 }
                 else if (width == 30 && height == 16 && mines == 99) {
-                    mfRef.currentDifficulty = "intermediate";
+                    diffic = "intermediate";
                 }
                 else {
-                    mfRef.currentDifficulty = "custom";//do nothing with best scores
+                    diffic = "custom";//do nothing with best scores
                 }
 
-                mfRef.createNewSizeGrid(width, height, mines);
+                mfRef.createNewSizeGrid(width, height, mines, diffic);
                 this.Dispose();
             }
             else {
