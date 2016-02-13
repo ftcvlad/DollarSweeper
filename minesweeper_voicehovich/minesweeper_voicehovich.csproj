@@ -46,16 +46,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutForm.cs">
+    <Compile Include="CounterPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DialogBoxes\AboutForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutForm.Designer.cs">
+    <Compile Include="DialogBoxes\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="customSizePopup.cs">
+    <Compile Include="DialogBoxes\customSizePopup.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="customSizePopup.Designer.cs">
+    <Compile Include="DialogBoxes\customSizePopup.Designer.cs">
       <DependentUpon>customSizePopup.cs</DependentUpon>
     </Compile>
     <Compile Include="Form1.cs">
@@ -64,36 +67,40 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="LossSelectorForm.cs">
+    <Compile Include="DialogBoxes\LossSelectorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LossSelectorForm.Designer.cs">
+    <Compile Include="DialogBoxes\LossSelectorForm.Designer.cs">
       <DependentUpon>LossSelectorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StatisticsForm.cs">
+    <Compile Include="DialogBoxes\StatisticsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StatisticsForm.Designer.cs">
+    <Compile Include="DialogBoxes\StatisticsForm.Designer.cs">
       <DependentUpon>StatisticsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="WinnerNameForm.cs">
+    <Compile Include="DialogBoxes\WinnerNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WinnerNameForm.Designer.cs">
+    <Compile Include="DialogBoxes\WinnerNameForm.Designer.cs">
       <DependentUpon>WinnerNameForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AboutForm.resx">
+    <Compile Include="SerializableArrays.cs" />
+    <Compile Include="SweeperPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Include="DialogBoxes\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="customSizePopup.resx">
+    <EmbeddedResource Include="DialogBoxes\customSizePopup.resx">
       <DependentUpon>customSizePopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LossSelectorForm.resx">
+    <EmbeddedResource Include="DialogBoxes\LossSelectorForm.resx">
       <DependentUpon>LossSelectorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -106,10 +113,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="StatisticsForm.resx">
+    <EmbeddedResource Include="DialogBoxes\StatisticsForm.resx">
       <DependentUpon>StatisticsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="WinnerNameForm.resx">
+    <EmbeddedResource Include="DialogBoxes\WinnerNameForm.resx">
       <DependentUpon>WinnerNameForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
