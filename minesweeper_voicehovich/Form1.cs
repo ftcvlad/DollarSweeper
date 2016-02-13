@@ -8,18 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using minesweeper_voicehovich.Properties;//for resources
-using System.Runtime.InteropServices;//for dllimport
+
 
 namespace minesweeper_voicehovich {
-    public partial class MainForm : Form {
-        int rows;
-        int cols;
-        int nOfBombs;
-        List<List<int>> grid;
-        bool firstTouch;
-        int demined;
-        int bombsMarked;
-        bool killMyBrain = false;
+
+    public partial class SweeperPanel : TableLayoutPanel {
+
 
         Bitmap one = Resources.one;
         Bitmap two = Resources.two;
@@ -35,27 +29,146 @@ namespace minesweeper_voicehovich {
         Bitmap bombBad = Resources.happyGirl;
         Bitmap bombWrong = Resources.girlWrong2;
 
+
+        Bitmap whileHovered = Resources.whileHovered;
+        Bitmap whilePressed = Resources.whilePressed;
+        Bitmap unopened = Resources.unopened;
+
+
+        MainForm refer = null;
+
+        public SweeperPanel(MainForm refer) {
+            this.refer = refer;
+
+            Bitmap[] allImages = { empty, one, two, three, four, five, six, seven, eight, flag, bomb, bombBad, bombWrong, whileHovered, whilePressed, unopened };
+            for (int i = 0; i < allImages.Length; i++) {
+                DrawLineInt(allImages[i]);
+            }
+            CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.None;
+        }
+
+        public void DrawLineInt(Bitmap bmp) {
+            Pen blackPen = new Pen(Color.DarkSeaGreen, 1);
+
+
+            using (var graphics = Graphics.FromImage(bmp)) {
+                graphics.DrawLine(blackPen, 0, 0, 0, 16);
+                graphics.DrawLine(blackPen, 0, 0, 16, 0);
+                graphics.DrawLine(blackPen, 16, 0, 16, 16);
+                graphics.DrawLine(blackPen, 0, 16, 16, 16);
+            }
+        }
+
+
+        protected override void OnPaint(PaintEventArgs e) {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+
+            //draw grid contained info
+            for (int r = 0; r < refer.rows; r++) {
+                for (int c = 0; c < refer.cols; c++) {
+
+                    Point topLeftLocation = new Point(c * refer.cellSize, r * refer.cellSize);
+
+
+                    if (refer.grid[r][c] == -1) {
+                        e.Graphics.DrawImage(one, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -2) {
+                        e.Graphics.DrawImage(two, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -3) {
+                        e.Graphics.DrawImage(three, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -4) {
+                        e.Graphics.DrawImage(four, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -5) {
+                        e.Graphics.DrawImage(five, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -6) {
+                        e.Graphics.DrawImage(six, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -7) {
+                        e.Graphics.DrawImage(seven, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -8) {
+                        e.Graphics.DrawImage(eight, topLeftLocation);
+                    }
+
+                    else if (refer.grid[r][c] == -10) {
+                        e.Graphics.DrawImage(empty, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -13) {
+                        e.Graphics.DrawImage(bombBad, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -14) {
+                        e.Graphics.DrawImage(bombWrong, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] == -15) {
+                        e.Graphics.DrawImage(bomb, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] >= 100) {
+                        e.Graphics.DrawImage(flag, topLeftLocation);
+                    }
+                    else if (refer.grid[r][c] >=0 && refer.grid[r][c]<=8 || refer.grid[r][c]==13) {
+                         e.Graphics.DrawImage(unopened, topLeftLocation);
+                       
+                        //Pen pen = new Pen(Color.DarkSeaGreen, 1);
+                        //e.Graphics.DrawRectangle(pen, new Rectangle(topLeftLocation.X, topLeftLocation.Y, 17, 17));
+                    }
+
+
+                }
+            }
+
+            //draw hovered, dragged cells
+            base.OnPaint(e);
+        }
+
+
+
+    }
+}
+
+
+
+
+
+
+namespace minesweeper_voicehovich {
+    public partial class MainForm : Form {
+        public int rows;
+        public int cols;
+        public List<List<int>> grid;
+        public int cellSize;
+
+        int nOfBombs;
+        bool firstTouch;
+        int demined;
+        int bombsMarked;
+        bool gameFinished;
+
+
+
         Bitmap manOrd = Resources.man;
         Bitmap manSad = Resources.sad;
         Bitmap manHap = Resources.happy;
         Bitmap manExcited = Resources.excited;
 
-        Bitmap whileHovered = Resources.whileHovered;
-        Bitmap whilePressed = Resources.whilePressed;
-
-        Bitmap unopened = null;
-       // Bitmap unopened = Resources.unopened;//*** no borders in between, but slower. Use rectangle?
+   
 
 
-        TableLayoutPanel tableLayoutPanel1;
-        PictureBox previousCursorOver = null;
+        SweeperPanel tableLayoutPanel1;
+       
         Timer MyTimer = new Timer();
         int timeElapsed = 0;
         int dollarsCollected = 0;
         public int moneyLostPerGirl = 10000;
+       
 
-        
-      
+
+
 
         public String currentDifficulty = "beginner";
 
@@ -63,9 +176,14 @@ namespace minesweeper_voicehovich {
         counterPanel timeCounter = new counterPanel();
         serializableArrays bestScores;
 
-
+        //!!! move rows , cols, cellSize to SweeperPanel
 
         public MainForm() {//contains initializations happening once
+
+           
+           
+           
+            
 
             InitializeComponent();
 
@@ -90,7 +208,7 @@ namespace minesweeper_voicehovich {
             this.FormBorderStyle= FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             
-            this.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
+         //   this.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
 
           
             MyTimer.Interval = (1000);
@@ -117,7 +235,7 @@ namespace minesweeper_voicehovich {
             this.rows = r;
             this.cols = c;
             this.nOfBombs = n;
-            int cellSize = 17;
+             cellSize = 17;
 
             int sideOffset = 50;
             int tableLayoutPanel2Width = Math.Max(270, cols * (cellSize + 1) + 1);
@@ -152,109 +270,126 @@ namespace minesweeper_voicehovich {
           
 
             //------------tableLayoutPanel1 ------------
-            tableLayoutPanel1 = new TableLayoutPanel();
+            tableLayoutPanel1 = new SweeperPanel(this);
             tableLayoutPanel1.SuspendLayout();
 
 
 
 
-           // tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.None;//***
-            tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(sideOffset, 120);
-            tableLayoutPanel1.Size = new Size(cols * (cellSize+1) + 1, rows * (cellSize + 1)+1);//take 1px border into account
-            tableLayoutPanel1.ColumnCount = cols;
-            tableLayoutPanel1.RowCount = rows;
-           
-
-            for (int i = 0; i < rows; i++) {
-                tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, cellSize));
-            }
-
-            for (int j = 0; j < cols; j++) {
-                tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, cellSize));
-            }
-
-            tableLayoutPanel1.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
             
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(sideOffset, 120);
+            tableLayoutPanel1.Size = new Size(cols *cellSize, rows *cellSize);
+          
 
-            for (int i = 0; i < r; i++) {
-                for (int j = 0; j < c; j++) {
+            //tableLayoutPanel1.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
 
-                    PictureBox pb = new PictureBox();
-
-
-                    pb.Margin = new Padding(0);
-
-
-                    pb.MouseMove += new MouseEventHandler(mousePictureboxMove);
-
-                    pb.MouseUp += new MouseEventHandler(digitEventHandler);
-                    pb.MouseDown += new MouseEventHandler(mdHandler);
+            tableLayoutPanel1.MouseUp += new MouseEventHandler(mouseUpEventHandler);
+            tableLayoutPanel1.MouseDown += new MouseEventHandler(mdHandler);
 
 
-                    
-
-                    pb.Image = unopened;
-                  
-                    pb.Tag = i * c + j;
-                    tableLayoutPanel1.Controls.Add(pb, j, i);
-                   
-                }
-            }
             tableLayoutPanel1.ResumeLayout();
             this.Controls.Add(tableLayoutPanel1);
 
+          
 
-           
-           
+
         }
 
 
-        
+
 
         private void mdHandler(object sender, MouseEventArgs e) {//when mouseDown, do current cell animation
 
-           
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+            
 
-                if (((PictureBox)sender).Image == whileHovered) {//add flag
-                    ((PictureBox)sender).Image = flag;
+            Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
+
+            int c = cursorTableRelative.X / cellSize;
+            int r = cursorTableRelative.Y / cellSize;
+
+            if (grid[r][c] < 0 || gameFinished) {
+                return;
+            }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+
+                if (grid[r][c] < 100) {//add flag
+
+                    grid[r][c] += 100;
                     bombsMarked++;
                     bombCounter.setNumber(nOfBombs - bombsMarked);
                 }
-                else if (((PictureBox)sender).Image == flag) {
-                    ((PictureBox)sender).Image = unopened;
+                else if (grid[r][c] >= 100) {
+                    grid[r][c] -= 100;
+
                     bombsMarked--;
                     bombCounter.setNumber(nOfBombs - bombsMarked);
-
+                   
                 }
-                killMyBrain = true;
+                tableLayoutPanel1.Invalidate(new Rectangle(c*cellSize,r*cellSize,cellSize,cellSize));//+++
+                
 
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Left) {
 
-                if (((PictureBox)sender).Image != flag) {
-                    ((PictureBox)sender).Image = whilePressed;
-                }
-                button1.Image = manExcited;
-            }
-
-
-
-               
-        }
-
-        private void mouseTableAndFrameMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
-            if (previousCursorOver != null) {//when pictureBox is disabled, table starts capturing events
-                if (previousCursorOver.Image!= flag && previousCursorOver.Enabled==true) {
-                    previousCursorOver.Image = unopened;
-                }
+                if (grid[r][c] < 100 && grid[r][c] >=0) {
+                   // ((PictureBox)sender).Image = whilePressed;//change previousCellPosition Point instead
+                    button1.Image = manExcited;
                     
-                previousCursorOver = null;
+                    tableLayoutPanel1.Invalidate(new Rectangle(c*cellSize,r*cellSize,cellSize,cellSize));//+++
+                }
+
             }
 
-            
+
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //pb.MouseMove += new MouseEventHandler(mousePictureboxMove);
+
+        //pb.MouseUp += new MouseEventHandler(mouseUpEventHandler);
+        //pb.MouseDown += new MouseEventHandler(mdHandler);
+
+
+        ////???
+        //private void mouseTableAndFrameMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
+        //    if (previousCursorOver != null) {//when pictureBox is disabled, table starts capturing events
+        //        if (previousCursorOver.Image!= flag && previousCursorOver.Enabled==true) {
+        //            previousCursorOver.Image = unopened;
+        //        }
+
+        //        previousCursorOver = null;
+        //    }
+
+
+        //}
 
         //3 CASES
         //1) mouse unpressed, leave cells => table/form mouseMove event
@@ -262,82 +397,112 @@ namespace minesweeper_voicehovich {
         //3) move from 1 cell to another (can jump between unopened cells not hitting cell borders (table)) => part B in pictureBox'es mouseMove event
         //also mark cell when first clicked; also use current cell (not sender) in mouseUp
 
-        private void mousePictureboxMove(object sender, MouseEventArgs e) {
-            //sender is always same => calculate source differently
+        //???
+        //private void mousePictureboxMove(object sender, MouseEventArgs e) {
+        //    //sender is always same => calculate source differently
 
-            Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
-            PictureBox source = (PictureBox)tableLayoutPanel1.GetChildAtPoint(cursorTableRelative);
-            
-            //part A
-            if (source == null || source.Enabled == false) {
-               
-                if (previousCursorOver != null) {
-                    if (previousCursorOver.Image != flag && previousCursorOver.Enabled == true) {
-                        previousCursorOver.Image = unopened;
-                    }
-                    previousCursorOver = null;
-                }
-                return;
+        //    //Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
+        //   // PictureBox source = (PictureBox)tableLayoutPanel1.GetChildAtPoint(cursorTableRelative);
+
+        //    Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
+
+
+        //    int x = cursorTableRelative.X;
+        //    int y = cursorTableRelative.Y;
+        //    if (x < 0 || y < 0 || x > cols * cellSize - 1 || y > rows * cellSize - 1) {
+        //        return;
+        //    }
+
+
+
+        //    int r = y / cellSize;
+        //    int c = x / cellSize;
+
+        //    if (grid[r][c] < 0) {
+        //        return;
+        //    }
+
+
+
+
+        //    //part A
+        //    if (source == null || source.Enabled == false) {
+
+        //        if (previousCursorOver != null) {
+        //            if (previousCursorOver.Image != flag && previousCursorOver.Enabled == true) {
+        //                previousCursorOver.Image = unopened;
+        //            }
+        //            previousCursorOver = null;
+        //        }
+        //        return;
+        //    }
+
+        //    //part B
+        //    if (killMyBrain) {
+        //        return;
+        //    }
+        //    if (source!= previousCursorOver) {
+        //        if (previousCursorOver != null && previousCursorOver.Image!=flag && previousCursorOver.Enabled == true) {
+        //            previousCursorOver.Image = unopened;
+        //        }
+
+        //        if (source.Image==flag ) {
+        //            previousCursorOver = null;
+        //            return;
+        //        }
+        //        previousCursorOver = source;
+
+        //        if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
+        //            source.Image = whilePressed;
+        //        }
+        //        else if (e.Button == MouseButtons.None) {
+
+        //            source.Image = whileHovered;
+        //        }
+        //    }
+
+        //}
+
+
+
+
+
+
+
+        private void mouseUpEventHandler(object sender, MouseEventArgs e) {
+
+            if (gameFinished == true) {
+                return;//if game finished
             }
-           
-            //part B
-            if (killMyBrain) {
-                return;
-            }
-            if (source!= previousCursorOver) {
-                if (previousCursorOver != null && previousCursorOver.Image!=flag && previousCursorOver.Enabled == true) {
-                    previousCursorOver.Image = unopened;
-                }
-            
-                if (source.Image==flag ) {
-                    previousCursorOver = null;
-                    return;
-                }
-                previousCursorOver = source;
-               
-                if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
-                    source.Image = whilePressed;
-                }
-                else if (e.Button == MouseButtons.None) {
-
-                    source.Image = whileHovered;
-                }
-            }
-
-        }
-
-
-
-
-
-
-
-        private void digitEventHandler(object sender, MouseEventArgs e) {
 
             button1.Image = manOrd;
 
-            killMyBrain = false;
+
+
 
             Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
-            PictureBox source = (PictureBox)tableLayoutPanel1.GetChildAtPoint(cursorTableRelative);
-            if (source == null) {//if press up outside cells
-                return;
+            //Console.WriteLine(cursorTableRelative.X + "   " + cursorTableRelative.Y);
+
+            int x = cursorTableRelative.X;
+            int y = cursorTableRelative.Y;
+            if (x<0 || y<0 || x>cols*cellSize-1 || y> rows * cellSize - 1) {
+                return;//if clicked outside SweeperPanel
             }
            
-          
-            int loc = Int32.Parse(source.Tag.ToString());
-            int r = loc / cols;
-            int c = loc % cols;
+           
 
-            
+            int r = y / cellSize;
+            int c = x / cellSize;
+
+            if (grid[r][c] < 0) {
+                return;//if cell already opened
+            }
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
 
-                if (source.Image == flag) {
-                    return;
+                if (grid[r][c] >=100) {
+                    return;//if leftclicked flag
                 }
 
-                source.Enabled = false;
-                
 
                 if (firstTouch == true) {
                     firstTouch = false;
@@ -346,106 +511,97 @@ namespace minesweeper_voicehovich {
                     MyTimer.Start();
                 }
 
-                if (grid[r][c] > 0) {
-                    openDigits(r, c, source);
-                    
+                if (grid[r][c] >= 1 && grid[r][c]<=8) {
+                   
+                    openDigits(r, c);
+                    grid[r][c] *= -1;
+                    tableLayoutPanel1.Invalidate(new Rectangle(c * cellSize, r * cellSize, cellSize, cellSize));//+++
+
+
                 }
-                else if (grid[r][c] == -1) {
+                else if (grid[r][c] == 13) {
 
                     dollarsCollected = dollarsCollected - moneyLostPerGirl;
                     dollarsCollectedLabel.Text = "$ " + dollarsCollected;
-                    source.Image = bombBad;
-                    
+                    grid[r][c] = -13;
+                    tableLayoutPanel1.Invalidate(new Rectangle(c * cellSize, r * cellSize, cellSize, cellSize));//+++
+
                     if (dollarsCollected<0) {
 
+                        gameFinished = true;
                         MyTimer.Stop();
                         button1.Image = manSad;
                         
 
                         for (int i = 0; i < rows; i++) {
                             for (int j = 0; j < cols; j++) {
-                                PictureBox nextCell = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
-                                nextCell.Enabled = false;
-
-                                if (grid[i][j] == -1 && nextCell.Image == unopened) {
-
-                                    nextCell.Image = bomb;
+                             
+                                if (grid[i][j] == 13) {
+                                    grid[i][j] = -15;
+                                    tableLayoutPanel1.Invalidate(new Rectangle(j * cellSize, i * cellSize, cellSize, cellSize));//+++
                                     continue;
                                 }
 
-                                if ((grid[i][j] != -1 && nextCell.Image == flag)) {
-                                    nextCell.Image = bombWrong;
+                                else if ((grid[i][j] >=100 && grid[i][j]!=113)) {
+                                    grid[i][j] = -14;
+                                    tableLayoutPanel1.Invalidate(new Rectangle(j * cellSize, i * cellSize, cellSize, cellSize));//+++
                                 }
+                               
 
 
                             }
                         }
 
-
-
-                        //stop timer
-                        return;
                     }
-                    else {
-                        source.Enabled = false;
-                    }
+                 
                 }
                 else if (grid[r][c] == 0) {
 
-
-                    //  DrawingControl.SuspendDrawing(this);
-                    grid[r][c] = -2;
+                    grid[r][c] = 10;
                     markEmptyRecursively(r, c);
 
                     for (int i = 0; i < rows; i++) {
                         for (int j = 0; j < cols; j++) {
 
-                            if (grid[i][j] == -2) {
-                                grid[i][j] = -3;
+                            //open empty cell and digits around it
+                            if (grid[i][j] == 10) {
+                                grid[i][j] = -10;
+                                tableLayoutPanel1.Invalidate(new Rectangle(j * cellSize, i * cellSize, cellSize, cellSize));//+++
+                                                        
                                 for (int dr = -1; dr <= 1; dr++) {
                                     for (int dc = -1; dc <= 1; dc++) {
-
-                                        if (i + dr >= 0 && j + dc >= 0 && i + dr < rows && j + dc < cols && grid[i + dr][j + dc] != -2 && grid[i + dr][j + dc] != -3 && grid[i + dr][j + dc] != 0 && ((PictureBox)tableLayoutPanel1.GetControlFromPosition(j+dc, i+dr)).Image != flag) {//!=0 is some bug case!
-
-                                            PictureBox borderDigit = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j + dc, i + dr);
-                                            openDigits(i + dr, j + dc, borderDigit);
-
-
-                                            grid[i + dr][j + dc] = -3;
-                                            borderDigit.Enabled = false;
-                                           
+                                        if (i + dr >= 0 && j + dc >= 0 && i + dr < rows && j + dc < cols && grid[i + dr][j + dc]>=1 && grid[i + dr][j + dc] <= 8) {
+                                          
+                                            openDigits(i + dr, j + dc);
+                                            grid[i + dr][j + dc] *= -1;
+                                            tableLayoutPanel1.Invalidate(new Rectangle((j + dc) * cellSize,(i + dr) * cellSize, cellSize, cellSize));//+++                                
                                         }
-
-
                                     }
                                 }
-
-
-
-                                PictureBox green = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
-                                green.Enabled = false;
                                 demined++;
-                                green.Image = empty;
-                                //System.Threading.Thread.Sleep(100);
-                            }//end of if ==-2
+                                
+                                
+                            }
                         }
                     }
 
-                    // DrawingControl.ResumeDrawing(this);
+                    
                 }
 
                
                 if (demined == rows * cols - nOfBombs) {
                     MyTimer.Stop();
-
+                    gameFinished = true;
                     button1.Image = manHap;
                     Console.WriteLine("Wiiiiiin");
 
                     for (int i = 0; i < rows; i++) {//mark unmarked bombs
                         for (int j = 0; j < cols; j++) {
 
-                            if (grid[i][j] == -1) {
-                                ((PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i)).Image = flag;
+                            if (grid[i][j] == 13) {
+                                grid[i][j] += 100;
+                                tableLayoutPanel1.Invalidate(new Rectangle(j * cellSize, i * cellSize, cellSize, cellSize));//+++
+
                             }
                         }
                     }
@@ -453,52 +609,52 @@ namespace minesweeper_voicehovich {
                     if (moneyLostPerGirl == 10000) {//record only 1 life games
                         bestScores.manageScores(currentDifficulty, timeElapsed);
                     }
-                    //stop timer
-                    //record results, top score
+                    
                     bombCounter.setNumber(0);
                 }
-               
+
+                //tableLayoutPanel1.Invalidate();
             }
 
         }
 
 
-        private void openDigits(int r, int c, PictureBox source) {
+        private void openDigits(int r, int c) {
             demined++;
             if (grid[r][c] == 1) {
-                source.Image = one;
+              
                 dollarsCollected++;
             }
             else if (grid[r][c] == 2) {
-                source.Image = two;
+                
                 dollarsCollected += 2;
             }
             else if (grid[r][c] == 3) {
-                source.Image = three;
+              
                 dollarsCollected += 3;
             }
             else if (grid[r][c] == 4) {
-                source.Image = four;
+               
                 dollarsCollected += 4;
             }
             else if (grid[r][c] == 5) {
-                source.Image = five;
+               
                 dollarsCollected += 5;
             }
             else if (grid[r][c] == 6) {
-                source.Image = six;
+                
                 dollarsCollected += 6;
             }
             else if (grid[r][c] == 7) {
-                source.Image = seven;
+               
                 dollarsCollected += 7;
             }
             else if (grid[r][c] == 8) {
-                source.Image = eight;
+              
                 dollarsCollected += 8;
             }
             dollarsCollectedLabel.Text = "$ " + dollarsCollected;
-            grid[r][c] = -3;
+            
 
 
         }
@@ -507,44 +663,33 @@ namespace minesweeper_voicehovich {
         private void markEmptyRecursively(int row, int col) {
 
             if (row - 1 >= 0 && grid[row - 1][col] == 0 ) {
-                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col, row-1)).Image != flag) {
-                    grid[row - 1][col] = -2;
+                    grid[row - 1][col] = 10;
                     markEmptyRecursively(row - 1, col);
-                }
-                
             }
             if (row + 1 < rows && grid[row + 1][col] == 0) {
-                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col, row+1)).Image != flag) {
-                    grid[row + 1][col] = -2;
+                    grid[row + 1][col] = 10;
                     markEmptyRecursively(row + 1, col);
-                }
-               
             }
             if (col - 1 >= 0 && grid[row][col-1] == 0) {
-                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col-1, row)).Image != flag) {
-                    grid[row][col - 1] = -2;
+                    grid[row][col - 1] = 10;
                     markEmptyRecursively(row, col - 1);
-                }
-                
             }
             if (col + 1 < cols && grid[row ][col+1] == 0) {
-                if (((PictureBox)tableLayoutPanel1.GetControlFromPosition(col+1, row)).Image != flag) {
-                    grid[row][col + 1] = -2;
+                    grid[row][col + 1] = 10;
                     markEmptyRecursively(row, col + 1);
-                }
-               
             }
         }
 
         private void newGame(object sender, EventArgs e) {
             button1.Image = manOrd;
-            startGame();
+            startGame(false);
         }
         //zzz
-        private void startGame() {
+        private void startGame(bool newDimensions ) {
 
             firstTouch = true;
             demined = 0;
+            gameFinished = false;
             dollarsCollected = 0;
             dollarsCollectedLabel.Text = "$ 0";
             bombsMarked = 0;
@@ -552,23 +697,35 @@ namespace minesweeper_voicehovich {
             timeCounter.setNumber(0);
             MyTimer.Stop();
             bombCounter.setNumber(nOfBombs);
+
+            if (!newDimensions) {//1st time or when grid resized, draw all grid
+               
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        if ((grid[i][j] < 0 || grid[i][j]>=100) ) {
+                            tableLayoutPanel1.Invalidate(new Rectangle(j * cellSize, i * cellSize, cellSize, cellSize));//+++
+                        }
+                    }
+                }
+            }
+            else {
+                tableLayoutPanel1.Invalidate();//+++
+            }
+
             grid = new List<List<int>>();
             for (int i = 0; i < rows; i++) {
                 List<int> nextRow = new List<int>();
                 for (int j = 0; j < cols; j++) {
-                    PictureBox con = (PictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
-                    con.Enabled = true;
-                    con.Image = unopened;
-                    //if (con.Image == flag) {
-                    //    con.Image = null;
-                    //}
+
                     nextRow.Add(0);
 
                 }
 
                 grid.Add(nextRow);
             }
-           
+           // tableLayoutPanel1.Invalidate();
+
+
 
         }
 
@@ -576,7 +733,7 @@ namespace minesweeper_voicehovich {
             int numOfCells = rows * cols;
 
             Random rnd = new Random((int)((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 1000));
-           // Random rnd = new Random(1);
+          
 
             List<int> allCells = new List<int>();//to avoid repeated random numbers
             for (int i = 0; i < numOfCells; i++) {
@@ -600,53 +757,27 @@ namespace minesweeper_voicehovich {
             for (int i=0;i< nOfBombs; i++) { 
                 index = rnd.Next(0, allCells.Count);
                
-                grid[allCells[index] / cols][allCells[index] % cols] = -1;
-
-                //hide this
-                //PictureBox  con = (PictureBox)tableLayoutPanel1.GetControlFromPosition(allCells[index] % cols, allCells[index] / cols);
-                //con.BackgroundImage = bomb;
-                //--------
-
+                grid[allCells[index] / cols][allCells[index] % cols]+= 13;//if user puts flag before 1st touch, it remains there! thus +13
                 allCells.RemoveAt(index);
             }
 
             //numbers
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    if (grid[i][j] != -1) {
+                    if (grid[i][j] != 13 && grid[i][j] != 113) {
                         int nOfBombsNextDoor = 0;
 
                         for (int dr = -1; dr <= 1; dr++) {
                             for (int dc = -1; dc <= 1; dc++) {
 
-                                if (i+dr>=0 && j+dc>=0 && i+dr<rows && j + dc < cols && grid[i + dr][j + dc] == -1) {
+                                if (i+dr>=0 && j+dc>=0 && i+dr<rows && j + dc < cols && grid[i + dr][j + dc] %100==13) {
                                     nOfBombsNextDoor++;
                                 }
                             }
                         }
 
-                        grid[i][j] = nOfBombsNextDoor;
-                        //hide this
-                        //if (nOfBombsNextDoor == 1) {
-                        //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundBackgroundImage = one;
-                        //}
-                        //else if (nOfBombsNextDoor == 2) {
-                        //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundBackgroundImage = two;
-                        //}
-                        //else if (nOfBombsNextDoor == 3) {
-                        //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundBackgroundImage = three;
-                        //}
-                        //else if (nOfBombsNextDoor == 4) {
-                        //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundBackgroundImage = four;
-                        //}
-                        //else if (nOfBombsNextDoor == 5) {
-                        //    Button con = (Button)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        //    con.BackgroundBackgroundImage = five;
-                        //}
+                        grid[i][j] += nOfBombsNextDoor;
+                        
                     }
 
                 }
@@ -656,7 +787,7 @@ namespace minesweeper_voicehovich {
 
         private void Form1_Load(object sender, EventArgs e) {
 
-            startGame();
+            startGame(true);
         }
 
         
@@ -666,7 +797,7 @@ namespace minesweeper_voicehovich {
         public  void createNewSizeGrid(int width, int height, int mines) {
             tableLayoutPanel1.Dispose();
             initializeTable(height, width, mines);//change width and height order, as I screwed i,j order
-            startGame();
+            startGame(true);
         }
 
     
@@ -802,7 +933,7 @@ namespace minesweeper_voicehovich {
 
 
 
-        Tuple<string, int> t = new Tuple<string, int>("Hello", 4);
+      
 
         private static String filePath = "bestScores.txt";
 
@@ -865,7 +996,7 @@ namespace minesweeper_voicehovich {
                     for (int j = 9; j > i; j--) {
                         arrToUpdate[j] = arrToUpdate[j - 1];
                     }
-                    //make enter name frame
+                    
 
                     Label aCaseForName=new Label();
                     WinnerNameForm form = new WinnerNameForm(aCaseForName);
@@ -882,27 +1013,3 @@ namespace minesweeper_voicehovich {
 }
 
 
-
-
-
-////do yuo wooooork?a
-
-
-
-
-// http://stackoverflow.com/questions/13194674/foreach-loop-to-create-100-buttons-painting-all-buttons-at-same-time-as-to-prev
-//class DrawingControl {
-//    [DllImport("user32.dll")]
-//    public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
-
-//    private const int WM_SETREDRAW = 11;
-
-//    public static void SuspendDrawing(Control parent) {
-//        SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
-//    }
-
-//    public static void ResumeDrawing(Control parent) {
-//        SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
-//        parent.Refresh();
-//    }
-//}

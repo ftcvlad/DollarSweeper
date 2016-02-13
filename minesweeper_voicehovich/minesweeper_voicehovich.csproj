@@ -156,9 +156,6 @@
     <None Include="Resources\six.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\flag.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\bomb.png" />
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +232,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\man.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flag.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
