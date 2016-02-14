@@ -85,6 +85,7 @@ namespace minesweeper_voicehovich {
         protected override void OnPaint(PaintEventArgs e) {
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            
             //draw grid contained info
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < cols; c++) {   
@@ -116,7 +117,6 @@ namespace minesweeper_voicehovich {
                     else if (grid[r][c] == -8) {
                         e.Graphics.DrawImage(eight, topLeftLocation);
                     }
-
                     else if (grid[r][c] == -10) {
                         e.Graphics.DrawImage(empty, topLeftLocation);
                     }
@@ -530,17 +530,12 @@ namespace minesweeper_voicehovich {
 
 
 
-        //3 CASES
-        //1) mouse unpressed, leave cells => table/form mouseMove event
-        //2) mouse pressed, leave cells => part A in pictureBox'es mouseMove event (as mousepressed, old pb continues to send events)
-        //3) move from 1 cell to another=> part B in pictureBox'es mouseMove event
-        //also mark cell when first clicked; also use current cell (not sender) in mouseUp
 
-        ////???
+     
         private void mousePictureboxMove(object sender, MouseEventArgs e) {
 
 
-
+            
             Point cursorTableRelative = this.PointToClient(Cursor.Position);
 
 
@@ -554,6 +549,7 @@ namespace minesweeper_voicehovich {
                 if (previousCell != null) {
                     if (grid[previousCell.Item1][previousCell.Item2] < 100 && grid[previousCell.Item1][previousCell.Item2] >= 0) {//&& previousCursorOver.Enabled == true
                         Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
+                       // UpdateBounds(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize);
                     }
                     previousCell = null;
                 }
@@ -565,13 +561,14 @@ namespace minesweeper_voicehovich {
 
 
 
-            //part B
+            
             //if (killMyBrain) {//nubas, taki udalil eto
             //    return;
             //}
             if (previousCell == null || (r != previousCell.Item1 || c != previousCell.Item2)) {//current cell is certainly not null
                 if (previousCell != null && grid[previousCell.Item1][previousCell.Item2] < 100 && grid[previousCell.Item1][previousCell.Item2] >= 0) {
                     Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
+                  //  UpdateBounds(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize);
                 }
 
                 if (grid[r][c] >=100) {
@@ -580,6 +577,7 @@ namespace minesweeper_voicehovich {
                 }
                 previousCell = new Tuple<int, int>(r, c);
                 Invalidate(new Rectangle(c * cellSize, r * cellSize, cellSize, cellSize));
+               // UpdateBounds(c * cellSize, r * cellSize, cellSize, cellSize);
 
                 if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
                   //  pressed = true;//??
