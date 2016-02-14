@@ -52,13 +52,14 @@ namespace minesweeper_voicehovich {
 
         public Tuple<int, int> previousCell = null;
 
+        Image foreground = Resources.why;
+        List<List<Bitmap>> foregroundCutList;
 
-       
         public SweeperPanel(MainForm refer, int cellSize) {
 
            
             DoubleBuffered = true;
-            //BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            
 
             this.cellSize = cellSize;
             this.mfReference = refer;
@@ -73,9 +74,56 @@ namespace minesweeper_voicehovich {
             MouseUp += new MouseEventHandler(mouseUpEventHandler);
             MouseDown += new MouseEventHandler(mdHandler);
             MouseMove += new MouseEventHandler(mousePictureboxMove);
+            this.DragEnter += new DragEventHandler(dragEnter);
+            this.DragDrop += new DragEventHandler(dragDrop);
 
-            //this.BorderStyle = BorderStyle.FixedSingle;
+           
+            AllowDrop = true;
+            
         }
+
+        public void dragEnter(object sender, DragEventArgs e) {
+            e.Effect = DragDropEffects.All;
+        }
+
+        public void dragDrop(object sender, DragEventArgs e) {
+            string[] filesNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+
+            string extension = System.IO.Path.GetExtension(filesNames[0]);
+            if (extension.Equals(".Jpg" , StringComparison.InvariantCultureIgnoreCase) || extension.Equals(".bmp", StringComparison.InvariantCultureIgnoreCase) || extension.Equals(".png", StringComparison.InvariantCultureIgnoreCase)) {
+
+                foreground = Image.FromFile(filesNames[0]);
+                  
+                foregroundCutList = cutForegroundImage();
+                Invalidate();
+            }
+        }
+
+        public List<List<Bitmap>> cutForegroundImage() {
+
+            List<List<Bitmap>> arrayOfPieces = new List<List<Bitmap>>();
+            Bitmap resizedImg = new Bitmap(foreground, new Size(cols * cellSize, rows * cellSize));
+
+            for (int r = 0; r < rows; r++) {
+                List<Bitmap> nextRow = new List<Bitmap>();
+                for (int c = 0; c < cols; c++) {
+                    Bitmap bmp = new Bitmap(cellSize, cellSize);
+                    Graphics g = Graphics.FromImage(bmp);
+
+                    
+                    g.DrawImage(resizedImg, 0, 0, new Rectangle(c*cellSize,r*cellSize,cellSize,cellSize), GraphicsUnit.Pixel);
+
+                    drawLeftTopBorder(bmp);
+                    nextRow.Add(bmp);
+
+                }
+                arrayOfPieces.Add(nextRow);
+            }
+               
+            return arrayOfPieces;
+        }
+
 
         public void drawLeftTopBorder(Bitmap img) {
           
@@ -142,8 +190,8 @@ namespace minesweeper_voicehovich {
                     else if (grid[r][c] >= 0 && grid[r][c] <= 8 || grid[r][c] == 13) {
                         e.Graphics.DrawImage(unopened, topLeftLocation);
 
-                        //Pen pen = new Pen(Color.DarkSeaGreen, 1);
-                        //e.Graphics.DrawRectangle(pen, new Rectangle(topLeftLocation.X, topLeftLocation.Y, 17, 17));
+                    
+                               e.Graphics.DrawImage(foregroundCutList[r][c], topLeftLocation);
                     }
 
 
@@ -193,6 +241,7 @@ namespace minesweeper_voicehovich {
             this.cols = c;
             this.nOfBombs = n;
 
+            foregroundCutList = cutForegroundImage();
         }
 
         private void mdHandler(object sender, MouseEventArgs e) {//when mouseDown, do current cell animation
@@ -534,22 +583,6 @@ namespace minesweeper_voicehovich {
 
         }
 
-
-
-
-
-
-
-
-
-       
-
-
-
-
-
-
-
         private void mousePictureboxMove(object sender, MouseEventArgs e) {
 
             
@@ -610,11 +643,6 @@ namespace minesweeper_voicehovich {
 
 
         } 
-
-        
-
-
-
 
 
     }
