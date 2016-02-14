@@ -9,7 +9,7 @@ using minesweeper_voicehovich.Properties;//for resources
 
 namespace minesweeper_voicehovich {
 
-    public class SweeperPanel : TableLayoutPanel {
+    public class SweeperPanel : Panel {
 
         Bitmap one = Resources.one;
         Bitmap two = Resources.two;
@@ -52,32 +52,39 @@ namespace minesweeper_voicehovich {
 
         public Tuple<int, int> previousCell = null;
 
+
+       
         public SweeperPanel(MainForm refer, int cellSize) {
+
+           
+            DoubleBuffered = true;
+            //BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+
             this.cellSize = cellSize;
             this.mfReference = refer;
 
             Bitmap[] allImages = { empty, one, two, three, four, five, six, seven, eight, flag, bomb, bombBad, bombWrong, whileHovered, whilePressed, unopened };
             for (int i = 0; i < allImages.Length; i++) {
-                DrawLineInt(allImages[i]);
+                drawLeftTopBorder(allImages[i]);
             }
-            CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.None;
+          
             MyTimer.Interval = (1000);
             MyTimer.Tick += new EventHandler(timerTicked);
             MouseUp += new MouseEventHandler(mouseUpEventHandler);
             MouseDown += new MouseEventHandler(mdHandler);
             MouseMove += new MouseEventHandler(mousePictureboxMove);
 
+            //this.BorderStyle = BorderStyle.FixedSingle;
         }
 
-        public void DrawLineInt(Bitmap bmp) {
-            Pen blackPen = new Pen(Color.DarkSeaGreen, 1);
-
-
-            using (var graphics = Graphics.FromImage(bmp)) {
-                graphics.DrawLine(blackPen, 0, 0, 0, 16);
-                graphics.DrawLine(blackPen, 0, 0, 16, 0);
-                graphics.DrawLine(blackPen, 16, 0, 16, 16);
-                graphics.DrawLine(blackPen, 0, 16, 16, 16);
+        public void drawLeftTopBorder(Bitmap img) {
+          
+          
+            using (Pen p = new Pen(Color.DarkSeaGreen, 1))
+            using (Graphics graphics = Graphics.FromImage(img)) {//using as graphics implements IDisposable
+                graphics.DrawLine(p, 0, 0, 0, 16);
+                graphics.DrawLine(p, 0, 0, 16, 0);
+              
             }
         }
 
@@ -156,7 +163,16 @@ namespace minesweeper_voicehovich {
                     e.Graphics.DrawImage(whilePressed, tlloc);
                 }
             }
+
+
+            //draw outside border
+            using (Pen blackPen = new Pen(Color.DarkSeaGreen, 1)){
+                e.Graphics.DrawRectangle(blackPen, new Rectangle(0, 0, cols * cellSize - 1, rows * cellSize - 1));
+            }
+           
             
+           
+
 
             //draw hovered, dragged cells
             base.OnPaint(e);
@@ -184,6 +200,8 @@ namespace minesweeper_voicehovich {
 
 
             Point cursorTableRelative = this.PointToClient(Cursor.Position);
+
+            Console.WriteLine(cursorTableRelative.X+"  "+ cursorTableRelative.Y);
 
             int c = cursorTableRelative.X / cellSize;
             int r = cursorTableRelative.Y / cellSize;
@@ -524,6 +542,7 @@ namespace minesweeper_voicehovich {
 
 
 
+       
 
 
 
@@ -531,11 +550,10 @@ namespace minesweeper_voicehovich {
 
 
 
-     
         private void mousePictureboxMove(object sender, MouseEventArgs e) {
 
-
             
+
             Point cursorTableRelative = this.PointToClient(Cursor.Position);
 
 
@@ -547,9 +565,9 @@ namespace minesweeper_voicehovich {
             //1) entered revealed cell 2) left grid while pressed (sender remains SweeperPanel)
             if (x < 0 || y < 0 || x > cols * cellSize - 1 || y > rows * cellSize - 1 || grid[r][c] < 0) {
                 if (previousCell != null) {
-                    if (grid[previousCell.Item1][previousCell.Item2] < 100 && grid[previousCell.Item1][previousCell.Item2] >= 0) {//&& previousCursorOver.Enabled == true
-                        Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
-                       // UpdateBounds(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize);
+                    if (grid[previousCell.Item1][previousCell.Item2] < 100 && grid[previousCell.Item1][previousCell.Item2] >= 0) {
+                          Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
+                      
                     }
                     previousCell = null;
                 }
@@ -561,26 +579,26 @@ namespace minesweeper_voicehovich {
 
 
 
-            
+
             //if (killMyBrain) {//nubas, taki udalil eto
             //    return;
             //}
             if (previousCell == null || (r != previousCell.Item1 || c != previousCell.Item2)) {//current cell is certainly not null
                 if (previousCell != null && grid[previousCell.Item1][previousCell.Item2] < 100 && grid[previousCell.Item1][previousCell.Item2] >= 0) {
-                    Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
-                  //  UpdateBounds(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize);
+                   Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
+                    
                 }
 
-                if (grid[r][c] >=100) {
+                if (grid[r][c] >= 100) {
                     previousCell = null;
                     return;
                 }
                 previousCell = new Tuple<int, int>(r, c);
-                Invalidate(new Rectangle(c * cellSize, r * cellSize, cellSize, cellSize));
-               // UpdateBounds(c * cellSize, r * cellSize, cellSize, cellSize);
+                 Invalidate(new Rectangle(c * cellSize, r * cellSize, cellSize, cellSize));
+           
 
                 if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
-                  //  pressed = true;//??
+                    //  pressed = true;//??
                 }
                 else if (e.Button == MouseButtons.None) {
 
