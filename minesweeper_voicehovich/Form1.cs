@@ -55,7 +55,7 @@ namespace minesweeper_voicehovich {
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
 
-            //   this.MouseMove += new MouseEventHandler(mouseTableAndFrameMove);
+            this.MouseMove += new MouseEventHandler(mouseMfMove);
 
 
             //http://stackoverflow.com/questions/2022660/how-to-get-the-size-of-a-winforms-form-titlebar-height
@@ -69,6 +69,22 @@ namespace minesweeper_voicehovich {
 
             bestScores = serializableArrays.Load();
         }
+
+        
+        //left grid while unpressed
+        private void mouseMfMove(object sender, MouseEventArgs e) {
+            if (tableLayoutPanel1.previousCell != null) {
+                if (tableLayoutPanel1.grid[tableLayoutPanel1.previousCell.Item1][tableLayoutPanel1.previousCell.Item2] < 100 &&
+                    tableLayoutPanel1.grid[tableLayoutPanel1.previousCell.Item1][tableLayoutPanel1.previousCell.Item2] >= 0) {//&& previousCursorOver.Enabled == true
+                    tableLayoutPanel1.Invalidate(new Rectangle(tableLayoutPanel1.previousCell.Item2 * cellSize, tableLayoutPanel1.previousCell.Item1 * cellSize, cellSize, cellSize));
+                }
+                tableLayoutPanel1.previousCell = null;
+            }
+            return;
+
+
+        }
+
 
         public void setDollarsLabel(string text) {
             dollarsCollectedLabel.Text = text;
@@ -124,98 +140,6 @@ namespace minesweeper_voicehovich {
 
 
 
-
-
-        //pb.MouseMove += new MouseEventHandler(mousePictureboxMove);
-
-        //pb.MouseUp += new MouseEventHandler(mouseUpEventHandler);
-        //pb.MouseDown += new MouseEventHandler(mdHandler);
-
-
-        ////???
-        //private void mouseTableAndFrameMove(object sender, MouseEventArgs e) {//when leave cells, do dehighlight animation
-        //    if (previousCursorOver != null) {//when pictureBox is disabled, table starts capturing events
-        //        if (previousCursorOver.Image!= flag && previousCursorOver.Enabled==true) {
-        //            previousCursorOver.Image = unopened;
-        //        }
-
-        //        previousCursorOver = null;
-        //    }
-
-
-        //}
-
-        //3 CASES
-        //1) mouse unpressed, leave cells => table/form mouseMove event
-        //2) mouse pressed, leave cells => part A in pictureBox'es mouseMove event (as mousepressed, old pb continues to send events)
-        //3) move from 1 cell to another (can jump between unopened cells not hitting cell borders (table)) => part B in pictureBox'es mouseMove event
-        //also mark cell when first clicked; also use current cell (not sender) in mouseUp
-
-        //???
-        //private void mousePictureboxMove(object sender, MouseEventArgs e) {
-        //    //sender is always same => calculate source differently
-
-        //    //Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
-        //   // PictureBox source = (PictureBox)tableLayoutPanel1.GetChildAtPoint(cursorTableRelative);
-
-        //    Point cursorTableRelative = tableLayoutPanel1.PointToClient(Cursor.Position);
-
-
-        //    int x = cursorTableRelative.X;
-        //    int y = cursorTableRelative.Y;
-        //    if (x < 0 || y < 0 || x > cols * cellSize - 1 || y > rows * cellSize - 1) {
-        //        return;
-        //    }
-
-
-
-        //    int r = y / cellSize;
-        //    int c = x / cellSize;
-
-        //    if (grid[r][c] < 0) {
-        //        return;
-        //    }
-
-
-
-
-        //    //part A
-        //    if (source == null || source.Enabled == false) {
-
-        //        if (previousCursorOver != null) {
-        //            if (previousCursorOver.Image != flag && previousCursorOver.Enabled == true) {
-        //                previousCursorOver.Image = unopened;
-        //            }
-        //            previousCursorOver = null;
-        //        }
-        //        return;
-        //    }
-
-        //    //part B
-        //    if (killMyBrain) {
-        //        return;
-        //    }
-        //    if (source!= previousCursorOver) {
-        //        if (previousCursorOver != null && previousCursorOver.Image!=flag && previousCursorOver.Enabled == true) {
-        //            previousCursorOver.Image = unopened;
-        //        }
-
-        //        if (source.Image==flag ) {
-        //            previousCursorOver = null;
-        //            return;
-        //        }
-        //        previousCursorOver = source;
-
-        //        if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
-        //            source.Image = whilePressed;
-        //        }
-        //        else if (e.Button == MouseButtons.None) {
-
-        //            source.Image = whileHovered;
-        //        }
-        //    }
-
-        //}
 
 
         private void newGame(object sender, EventArgs e) {
