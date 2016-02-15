@@ -31,6 +31,7 @@ namespace minesweeper_voicehovich {
             this.LocationChanged += new EventHandler(formChangedLoc);
             this.MaximizeBox = false;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.CenterToScreen();
         }
 
         private void formChangedLoc(object sender, EventArgs e) {

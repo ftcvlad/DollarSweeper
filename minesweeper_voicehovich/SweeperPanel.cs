@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
-using minesweeper_voicehovich.Properties;//for resources
+using minesweeper_voicehovich.Properties;
 
 namespace minesweeper_voicehovich {
 
@@ -27,7 +27,7 @@ namespace minesweeper_voicehovich {
 
         Bitmap whileHovered = Resources.whileHovered;
         Bitmap whilePressed = Resources.whilePressed;
-        Bitmap unopened = Resources.unopened;
+       
 
 
         MainForm mfReference = null;
@@ -52,7 +52,7 @@ namespace minesweeper_voicehovich {
 
         public Tuple<int, int> previousCell = null;
 
-        Image foreground = Resources.why;
+        private Image foreground = Resources.grad0;
         List<List<Bitmap>> foregroundCutList;
 
         public SweeperPanel(MainForm refer, int cellSize) {
@@ -64,7 +64,7 @@ namespace minesweeper_voicehovich {
             this.cellSize = cellSize;
             this.mfReference = refer;
 
-            Bitmap[] allImages = { empty, one, two, three, four, five, six, seven, eight, flag, bomb, bombBad, bombWrong, whileHovered, whilePressed, unopened };
+            Bitmap[] allImages = { empty, one, two, three, four, five, six, seven, eight, flag, bomb, bombBad, bombWrong, whileHovered, whilePressed };
             for (int i = 0; i < allImages.Length; i++) {
                 drawLeftTopBorder(allImages[i]);
             }
@@ -80,6 +80,13 @@ namespace minesweeper_voicehovich {
            
             AllowDrop = true;
             
+        }
+
+
+        public void changeForegroundFromDialog(Image newImage) {
+            foreground = newImage;
+            foregroundCutList = cutForegroundImage();
+            Invalidate();
         }
 
         public void dragEnter(object sender, DragEventArgs e) {
@@ -188,7 +195,7 @@ namespace minesweeper_voicehovich {
                         e.Graphics.DrawImage(flag, topLeftLocation);
                     }
                     else if (grid[r][c] >= 0 && grid[r][c] <= 8 || grid[r][c] == 13) {
-                        e.Graphics.DrawImage(unopened, topLeftLocation);
+                        //e.Graphics.DrawImage(unopened, topLeftLocation);
 
                     
                                e.Graphics.DrawImage(foregroundCutList[r][c], topLeftLocation);
@@ -250,7 +257,7 @@ namespace minesweeper_voicehovich {
 
             Point cursorTableRelative = this.PointToClient(Cursor.Position);
 
-            Console.WriteLine(cursorTableRelative.X+"  "+ cursorTableRelative.Y);
+            
 
             int c = cursorTableRelative.X / cellSize;
             int r = cursorTableRelative.Y / cellSize;
@@ -608,14 +615,6 @@ namespace minesweeper_voicehovich {
             }
 
 
-
-
-
-
-
-            //if (killMyBrain) {//nubas, taki udalil eto
-            //    return;
-            //}
             if (previousCell == null || (r != previousCell.Item1 || c != previousCell.Item2)) {//current cell is certainly not null
                 if (previousCell != null && grid[previousCell.Item1][previousCell.Item2] < 100 && grid[previousCell.Item1][previousCell.Item2] >= 0) {
                    Invalidate(new Rectangle(previousCell.Item2 * cellSize, previousCell.Item1 * cellSize, cellSize, cellSize));
@@ -631,7 +630,7 @@ namespace minesweeper_voicehovich {
            
 
                 if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) {
-                    //  pressed = true;//??
+                    
                 }
                 else if (e.Button == MouseButtons.None) {
 

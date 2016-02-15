@@ -55,6 +55,7 @@
             this.ClientSize = new System.Drawing.Size(284, 270);
             this.Controls.Add(this.AboutOkButton);
             this.Controls.Add(this.AboutLabel);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AboutForm";
             this.Text = "About DollarSweeper";
             this.Load += new System.EventHandler(this.AboutForm_Load);

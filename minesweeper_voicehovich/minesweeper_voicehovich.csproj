@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DialogBoxes\ChangeAppearanceForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DialogBoxes\ChangeAppearanceForm.Designer.cs">
+      <DependentUpon>ChangeAppearanceForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="CounterPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -87,10 +93,18 @@
     <Compile Include="DialogBoxes\WinnerNameForm.Designer.cs">
       <DependentUpon>WinnerNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SerializableArrays.cs" />
     <Compile Include="SweeperPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <EmbeddedResource Include="DialogBoxes\ChangeAppearanceForm.resx">
+      <DependentUpon>ChangeAppearanceForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DialogBoxes\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -105,14 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="DialogBoxes\StatisticsForm.resx">
       <DependentUpon>StatisticsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,9 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\img.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\five.png" />
@@ -161,15 +167,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\six.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bomb.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bombBad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bombWrong.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\unopened.png" />
@@ -244,10 +241,22 @@
     <None Include="Resources\flag.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\qutw.png" />
+    <None Include="Resources\why.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\why.png" />
+    <None Include="Resources\look0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\look1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\look2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grad1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grad2.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

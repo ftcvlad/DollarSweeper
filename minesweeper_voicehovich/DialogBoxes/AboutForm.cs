@@ -13,6 +13,7 @@ namespace minesweeper_voicehovich {
         public AboutForm() {
             InitializeComponent();
             AboutLabel.MaximumSize = new Size(250,230);
+            this.CenterToScreen();
         }
 
         private void AboutOkButton_Click(object sender, EventArgs e) {

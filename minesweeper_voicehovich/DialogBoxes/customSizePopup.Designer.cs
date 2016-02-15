@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CustomSizeForm));
             this.ok = new System.Windows.Forms.Button();
             this.cancel = new System.Windows.Forms.Button();
             this.tbWidth = new System.Windows.Forms.TextBox();
@@ -111,7 +112,7 @@
             this.label3.TabIndex = 7;
             this.label3.Text = "Mines (1-99):";
             // 
-            // CustomSize
+            // CustomSizeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -124,7 +125,8 @@
             this.Controls.Add(this.tbWidth);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.ok);
-            this.Name = "CustomSize";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "CustomSizeForm";
             this.Text = "CustomSize";
             this.Load += new System.EventHandler(this.CustomSize_Load);
             this.ResumeLayout(false);

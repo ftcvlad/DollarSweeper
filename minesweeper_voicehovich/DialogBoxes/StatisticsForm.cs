@@ -16,6 +16,7 @@ namespace minesweeper_voicehovich {
             this.MaximizeBox = false;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             InitializeComponent();
+            this.CenterToScreen();
         }
 
         private void StatisticsForm_Load(object sender, EventArgs e) {

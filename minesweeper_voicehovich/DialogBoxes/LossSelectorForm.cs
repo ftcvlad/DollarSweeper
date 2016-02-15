@@ -16,6 +16,7 @@ namespace minesweeper_voicehovich {
             InitializeComponent();
             MessageLabel.MaximumSize = new Size(211, 0);
             this.ControlBox = false;
+            this.CenterToScreen();
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e) {
@@ -34,6 +35,10 @@ namespace minesweeper_voicehovich {
         }
 
         private void groupBox1_Enter(object sender, EventArgs e) {
+
+        }
+
+        private void LossSelectorForm_Load(object sender, EventArgs e) {
 
         }
     }

@@ -54,6 +54,7 @@ namespace minesweeper_voicehovich {
 
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            //this.Icon = (System.Drawing.Icon)manHap;
 
             this.MouseMove += new MouseEventHandler(mouseMfMove);
 
@@ -68,6 +69,7 @@ namespace minesweeper_voicehovich {
             initializeMfFlexiblecomponents(9, 9, 10, "beginner");
 
             bestScores = serializableArrays.Load();
+            this.CenterToScreen();
         }
 
         
@@ -124,8 +126,8 @@ namespace minesweeper_voicehovich {
             this.tableLayoutPanel1.Location = new System.Drawing.Point(sideOffset, 120);
             tableLayoutPanel1.Size = new Size(cols * cellSize, rows * cellSize);
             tableLayoutPanel1.initializeSweeperPanel(rows, cols, nOfBombs, difficulty);
-           
 
+            
         }
 
        
@@ -200,6 +202,11 @@ namespace minesweeper_voicehovich {
 
 
             AboutForm form = new AboutForm();
+            form.ShowDialog();
+        }
+
+        private void changeAppearanceToolStripMenuItem_Click(object sender, EventArgs e) {
+            ChangeAppearanceForm form = new ChangeAppearanceForm(tableLayoutPanel1);
             form.ShowDialog();
         }
     }

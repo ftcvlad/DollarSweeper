@@ -17,6 +17,7 @@ namespace minesweeper_voicehovich {
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
          
             this.ControlBox = false;
+            this.CenterToScreen();
         }
 
         private void button1_Click(object sender, EventArgs e) {
