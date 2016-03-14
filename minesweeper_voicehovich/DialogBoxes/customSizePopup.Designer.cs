@@ -92,7 +92,8 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(68, 13);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Width (1-30):";
+            this.label1.Text = "Width (1-60):";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
             // 
@@ -101,16 +102,16 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(71, 13);
             this.label2.TabIndex = 6;
-            this.label2.Text = "Height (1-24):";
+            this.label2.Text = "Height (1-40):";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(46, 93);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(68, 13);
+            this.label3.Size = new System.Drawing.Size(74, 13);
             this.label3.TabIndex = 7;
-            this.label3.Text = "Mines (1-99):";
+            this.label3.Text = "Mines (1-400):";
             // 
             // CustomSizeForm
             // 

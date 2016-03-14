@@ -52,13 +52,13 @@ namespace minesweeper_voicehovich {
             }
            
             if (source.Name.Equals("tbWidth")) {
-                checkValidity( 30, source);
+                checkValidity( 60, source);
             }
             else if (source.Name.Equals("tbHeight")) {
-                checkValidity( 24, source);
+                checkValidity( 40, source);
             }
             if (source.Name.Equals("tbMines")) {
-                checkValidity( 99, source);
+                checkValidity( 400, source);
             }
         }
 
@@ -173,6 +173,10 @@ namespace minesweeper_voicehovich {
         }
 
         private void CustomSize_Load(object sender, EventArgs e) {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e) {
 
         }
     }

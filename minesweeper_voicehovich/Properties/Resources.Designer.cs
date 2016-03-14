@@ -173,36 +173,6 @@ namespace minesweeper_voicehovich.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap bomb {
-            get {
-                object obj = ResourceManager.GetObject("bomb", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bombBad {
-            get {
-                object obj = ResourceManager.GetObject("bombBad", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bombWrong {
-            get {
-                object obj = ResourceManager.GetObject("bombWrong", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap eight {
             get {
                 object obj = ResourceManager.GetObject("eight", resourceCulture);
@@ -283,6 +253,36 @@ namespace minesweeper_voicehovich.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap grad0 {
+            get {
+                object obj = ResourceManager.GetObject("grad0", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap grad1 {
+            get {
+                object obj = ResourceManager.GetObject("grad1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap grad2 {
+            get {
+                object obj = ResourceManager.GetObject("grad2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap happy {
             get {
                 object obj = ResourceManager.GetObject("happy", resourceCulture);
@@ -296,6 +296,36 @@ namespace minesweeper_voicehovich.Properties {
         internal static System.Drawing.Bitmap happyGirl {
             get {
                 object obj = ResourceManager.GetObject("happyGirl", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap look0 {
+            get {
+                object obj = ResourceManager.GetObject("look0", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap look1 {
+            get {
+                object obj = ResourceManager.GetObject("look1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap look2 {
+            get {
+                object obj = ResourceManager.GetObject("look2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -373,16 +403,6 @@ namespace minesweeper_voicehovich.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap unopened {
-            get {
-                object obj = ResourceManager.GetObject("unopened", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap whileHovered {
             get {
                 object obj = ResourceManager.GetObject("whileHovered", resourceCulture);
@@ -396,6 +416,16 @@ namespace minesweeper_voicehovich.Properties {
         internal static System.Drawing.Bitmap whilePressed {
             get {
                 object obj = ResourceManager.GetObject("whilePressed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap why {
+            get {
+                object obj = ResourceManager.GetObject("why", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
